@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/simple-technical-writing",
+  "version": "0.0.2",
+  "kind": "skill",
+  "description": "Write, rewrite, or review technical prose in clear, direct English while preserving technical meaning.",
+  "entrypoints": {
+    "skill": "./SKILL.md"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {}
+}

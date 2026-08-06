@@ -1,0 +1,44 @@
+{
+  "name": "@diego/development-profile",
+  "version": "0.0.1",
+  "description": "Persistent development instructions for Claude Code and Codex.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegolanda/ai-flows.git",
+    "directory": "packages/profiles/development"
+  },
+  "homepage": "https://github.com/diegolanda/ai-flows/tree/main/packages/profiles/development#readme",
+  "bugs": {
+    "url": "https://github.com/diegolanda/ai-flows/issues"
+  },
+  "keywords": [
+    "oakshelf",
+    "profile",
+    "claude-code",
+    "codex",
+    "agent-instructions"
+  ],
+  "files": [
+    "oakshelf.json",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@diego/simple-technical-writing": "workspace:^"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "oakshelf": {
+    "kind": "profile",
+    "manifest": "./oakshelf.json"
+  },
+  "scripts": {
+    "check": "node ../../../scripts/check-package.mjs . profile",
+    "pack:dry": "npm pack --dry-run"
+  }
+}

@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+*.tgz
+.DS_Store
+coverage/
+dist/
+docs/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.oakrc
+*.pem
+*.key
+*.p12
+*.pfx

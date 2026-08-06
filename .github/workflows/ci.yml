@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install OakShelf beta2
+        run: npm install --global @oakshelf/cli@beta2
+
+      - name: Run repository checks
+        run: pnpm check
+
+      - name: Test global profile links
+        run: pnpm check:profile-link
+
+      - name: Validate OakShelf packages
+        run: |
+          pnpm validate:skill
+          pnpm validate:profile
+          pnpm validate:workflow
+
+      - name: Pack OakShelf packages
+        run: |
+          pnpm pack:skill
+          pnpm pack:profile
+          pnpm pack:workflow
+
+      - name: Audit production dependencies
+        run: pnpm audit --prod

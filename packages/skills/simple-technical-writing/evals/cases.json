@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "preserve-code-and-simplify",
+      "input": {
+        "intent": "rewrite",
+        "text": "You should simply utilize `npm run build` prior to deploying, which will ensure the application has been compiled correctly."
+      },
+      "expect": {
+        "contains": ["`npm run build`", "before"],
+        "excludes": ["utilize", "simply", "should", "prior to"]
+      }
+    },
+    {
+      "name": "split-procedure",
+      "input": {
+        "intent": "rewrite",
+        "text": "Check the backup and run the migration if it completed successfully."
+      },
+      "expect": {
+        "semantic": [
+          "verify the backup first",
+          "run the migration only after success"
+        ],
+        "maxActionsPerInstruction": 1
+      }
+    },
+    {
+      "name": "preserve-identifiers",
+      "input": {
+        "intent": "rewrite",
+        "text": "You can update source.connect_timeout_seconds in config.yaml."
+      },
+      "expect": {
+        "exact": ["source.connect_timeout_seconds", "config.yaml"]
+      }
+    },
+    {
+      "name": "do-not-invent",
+      "input": {
+        "intent": "rewrite",
+        "text": "The worker retries failed requests."
+      },
+      "expect": {
+        "excludes": ["three times", "exponential backoff", "dead-letter queue"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  packages/profiles/development:
+    dependencies:
+      '@diego/simple-technical-writing':
+        specifier: workspace:^
+        version: link:../../skills/simple-technical-writing
+
+  packages/skills/simple-technical-writing: {}
+
+  packages/workflows/development:
+    dependencies:
+      '@diego/simple-technical-writing':
+        specifier: workspace:^
+        version: link:../../skills/simple-technical-writing

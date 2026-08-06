@@ -1,0 +1,36 @@
+{
+  "name": "ai-flows",
+  "version": "0.0.1",
+  "private": true,
+  "description": "OakShelf skills, profiles, and workflows published under the @diego namespace.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegolanda/ai-flows.git"
+  },
+  "homepage": "https://github.com/diegolanda/ai-flows#readme",
+  "bugs": {
+    "url": "https://github.com/diegolanda/ai-flows/issues"
+  },
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check-workspace.mjs && node --test && node scripts/check-package.mjs packages/skills/simple-technical-writing skill && node scripts/check-package.mjs packages/profiles/development profile && node scripts/check-package.mjs packages/workflows/development workflow",
+    "check:profile-link": "node scripts/check-profile-link.mjs",
+    "list": "pnpm --recursive list --depth -1",
+    "validate:skill": "oak validate packages/skills/simple-technical-writing",
+    "validate:profile": "oak validate packages/profiles/development",
+    "validate:workflow": "oak validate packages/workflows/development",
+    "pack:skill": "oak pack packages/skills/simple-technical-writing --out dist",
+    "pack:profile": "oak pack packages/profiles/development --out dist",
+    "pack:workflow": "oak pack packages/workflows/development --out dist",
+    "publish:skill": "oak publish packages/skills/simple-technical-writing",
+    "publish:profile": "oak publish packages/profiles/development",
+    "pack:skill:npm": "pnpm --filter @diego/simple-technical-writing pack",
+    "pack:profile:npm": "pnpm --filter @diego/development-profile pack",
+    "pack:workflow:npm": "pnpm --filter @diego/development pack"
+  }
+}

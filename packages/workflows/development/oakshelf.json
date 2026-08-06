@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/development",
+  "version": "0.0.1",
+  "kind": "workflow",
+  "description": "A scaffold for a software-development workflow that uses simple technical writing for final artifacts.",
+  "entrypoints": {
+    "workflow": "./WORKFLOW.md"
+  },
+  "files": [
+    "WORKFLOW.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@diego/simple-technical-writing": "^0.0.2"
+  }
+}

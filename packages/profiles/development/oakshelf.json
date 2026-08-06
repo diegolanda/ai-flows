@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/development-profile",
+  "version": "0.0.1",
+  "kind": "profile",
+  "description": "Persistent development instructions for Claude Code and Codex.",
+  "entrypoints": {
+    "claude": "./CLAUDE.md",
+    "codex": "./AGENTS.md"
+  },
+  "files": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@diego/simple-technical-writing": "^0.0.2"
+  }
+}
