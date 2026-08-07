@@ -45,6 +45,45 @@
       "expect": {
         "excludes": ["three times", "exponential backoff", "dead-letter queue"]
       }
+    },
+    {
+      "name": "replace-uncommon-general-words",
+      "input": {
+        "intent": "rewrite",
+        "text": "A transient settlement failure can overcharge a paid preview."
+      },
+      "expect": {
+        "contains": ["temporary"],
+        "excludes": ["transient"],
+        "semantic": ["a temporary settlement error can charge too many credits"]
+      }
+    },
+    {
+      "name": "explain-required-technical-term",
+      "input": {
+        "intent": "rewrite",
+        "text": "Malformed frozen exclusion snapshots fail open."
+      },
+      "expect": {
+        "excludes": ["malformed"],
+        "semantic": [
+          "invalid saved exclusion data is accepted",
+          "explain any required domain term in common words"
+        ]
+      }
+    },
+    {
+      "name": "put-review-consequence-first",
+      "input": {
+        "intent": "rewrite review finding",
+        "text": "The settlement claim falls back to the original reservation after an error. The customer loses the expected refund."
+      },
+      "expect": {
+        "semantic": [
+          "state the lost refund before the internal recovery behavior",
+          "preserve the relationship between the error and the full charge"
+        ]
+      }
     }
   ]
 }

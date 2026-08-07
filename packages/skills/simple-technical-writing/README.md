@@ -4,6 +4,8 @@ An OakShelf skill that writes, rewrites, or reviews technical prose in clear, di
 
 Use it when you want technical text that is concise, consistent, and easier to translate.
 
+The skill prefers common words for general language. It explains necessary technical terms when they first appear.
+
 ## Example requests
 
 - "Rewrite this runbook using Simplified Technical English principles."
@@ -13,6 +15,8 @@ Use it when you want technical text that is concise, consistent, and easier to t
 ## Guarantees
 
 The skill instructs the model to preserve code, commands, identifiers, paths, URLs, API names, configuration keys, product names, and quoted errors.
+
+For review findings, the skill puts the visible consequence before the internal cause. It also avoids dense groups of technical nouns.
 
 This package uses controlled technical-writing principles. It does not claim formal ASD-STE100 compliance.
 

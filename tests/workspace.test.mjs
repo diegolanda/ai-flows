@@ -22,6 +22,14 @@ test("skill defines procedural and descriptive limits", async () => {
   assert.match(skill, /25 words or fewer/);
 });
 
+test("skill requires common vocabulary and clear review findings", async () => {
+  const skill = await read("packages/skills/simple-technical-writing/SKILL.md");
+  assert.match(skill, /temporary, not transient/);
+  assert.match(skill, /explain it in common words the first time/);
+  assert.match(skill, /more than three consecutive nouns/);
+  assert.match(skill, /consequence before the internal cause/);
+});
+
 test("skill package metadata is aligned", async () => {
   const packageJson = JSON.parse(
     await read("packages/skills/simple-technical-writing/package.json"),

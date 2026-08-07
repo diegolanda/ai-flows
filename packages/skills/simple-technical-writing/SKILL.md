@@ -168,6 +168,51 @@ Delete words that add no technical information, such as:
 - it is worth noting
 - in order to
 
+## Use common vocabulary
+
+Assume that the reader understands software but might not be a native English speaker.
+
+Use a common word when it preserves the exact technical meaning.
+
+Do not use a rare or formal word only because it is shorter. Prefer these words:
+
+- temporary, not transient
+- invalid, not malformed
+- out of date, not stale
+- later, not subsequently
+
+These preferences do not apply to protected technical content or established domain terms.
+
+If a technical term is necessary, explain it in common words the first time that you use it.
+
+Example:
+
+Unclear:
+
+> The validation fails open.
+
+Clear:
+
+> The validation fails open. This means that the system accepts data when validation cannot finish.
+
+Avoid idioms when a literal description is accurate. This rule includes phrases such as `falls back` and `fails open`.
+
+Avoid groups of more than three consecutive nouns. Rewrite the group as a clause when possible.
+
+Example:
+
+Unclear:
+
+> A paid preview settlement recovery failure can overcharge the customer.
+
+Clear:
+
+> If recovery fails while the system settles a paid preview, the customer can be overcharged.
+
+For review findings, state the user-visible or system-visible consequence before the internal cause.
+
+Use a direct consequence in the heading. Put detailed implementation terms in the explanation.
+
 ## Debugging and failure analysis
 
 Separate facts from hypotheses.
@@ -266,6 +311,10 @@ Before returning technical prose:
 7. Make terminology consistent.
 8. Confirm that procedural conditions appear before actions.
 9. Confirm that the skill did not affect marketing or expressive content.
+10. Replace uncommon words when a common word preserves the meaning.
+11. Explain necessary technical terms on first use.
+12. Rewrite groups of more than three consecutive nouns.
+13. Put the consequence before the internal cause in review findings.
 
 ## Compliance boundary
 
