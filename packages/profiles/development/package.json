@@ -1,6 +1,6 @@
 {
   "name": "@diego/development-profile",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Persistent development instructions for Claude Code and Codex.",
   "license": "MIT",
   "author": "Diego Landa",
@@ -28,7 +28,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@diego/simple-technical-writing": "workspace:^"
+    "@diego/simple-technical-writing": "workspace:~"
   },
   "publishConfig": {
     "access": "public"

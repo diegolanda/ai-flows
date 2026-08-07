@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "@diego/development-profile",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "kind": "profile",
   "description": "Persistent development instructions for Claude Code and Codex.",
   "entrypoints": {
@@ -15,6 +15,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@diego/simple-technical-writing": "^0.0.2"
+    "@diego/simple-technical-writing": "~0.0.3"
   }
 }

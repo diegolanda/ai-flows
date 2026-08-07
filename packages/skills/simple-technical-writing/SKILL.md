@@ -2,17 +2,16 @@
 name: diego-simple-technical-writing
 description: |
   Write, rewrite, or review human-readable technical prose in clear, direct
-  English while preserving facts, uncertainty, and technical tokens. Use when
-  the user requests technical documentation, plans, diagnoses, explanations,
-  READMEs, runbooks, procedures, errors, release notes, incident reports, API
-  guides, pull requests, commit messages, or agent instructions. Also use for
-  requests involving STE, Simplified Technical English, ASD-STE100, de-slopping,
-  non-native readers, or translation-ready technical content. Do not activate
-  for ordinary coding, debugging, or analysis unless the user requests help
-  with the prose.
+  English while preserving facts, uncertainty, and technical tokens. Apply it
+  by default to plans, updates, diagnoses, explanations, reviews, and other
+  human-readable communication during coding, debugging, analysis, testing,
+  and operations. Do not apply the prose rules to source code, generated diffs,
+  logs, or protected technical content. Also use for requests involving STE,
+  Simplified Technical English, ASD-STE100, de-slopping, non-native readers, or
+  translation-ready technical content.
 license: MIT
 metadata:
-  version: "0.0.2"
+  version: "0.0.3"
   standard: ASD-STE100 Issue 9 (2025-01-15)
   compliance: inspired-subset
   scope: software-development-and-operations
@@ -24,11 +23,15 @@ Apply this skill to human-readable technical content created during software dev
 
 This skill governs prose. It does not change the technical task, the reasoning process, or source code.
 
-## Activate this skill
+## Apply this skill by default
 
-Use this skill when the user asks you to write, rewrite, review, simplify, or translate technical prose.
+Apply this skill to all human-readable technical communication during software development.
 
-Also use this skill when another skill or workflow explicitly invokes it for a writing task.
+This requirement includes communication during coding, debugging, analysis, testing, and operations.
+
+Do not wait for the user to request clearer prose.
+
+Also use this skill when another skill, profile, or workflow invokes it.
 
 The requested prose can include:
 
@@ -41,7 +44,7 @@ The requested prose can include:
 - prompts, skills, workflows, and agent instructions
 - technical UI messages and support responses
 
-Also activate this skill when the user asks for:
+Also apply this skill when the user asks for:
 
 - STE or Simplified Technical English
 - ASD-STE100-style technical writing
@@ -50,9 +53,7 @@ Also activate this skill when the user asks for:
 - technical content that is easier to translate
 - removal of AI filler or "AI slop"
 
-Do not activate this skill only because a task includes coding, debugging, analysis, testing, or operations.
-
-## Do not activate this skill
+## Content exclusions
 
 Do not apply this skill to:
 

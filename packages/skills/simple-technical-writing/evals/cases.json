@@ -84,6 +84,20 @@
           "preserve the relationship between the error and the full charge"
         ]
       }
+    },
+    {
+      "name": "apply-during-development-by-default",
+      "input": {
+        "intent": "complete a coding task",
+        "text": "Fix the timeout bug and explain the result. I did not request a prose rewrite."
+      },
+      "expect": {
+        "semantic": [
+          "apply the writing rules to plans, updates, diagnoses, explanations, and the final summary",
+          "do not apply the prose rules to source code or generated diffs",
+          "do not require a separate request for clearer prose"
+        ]
+      }
     }
   ]
 }

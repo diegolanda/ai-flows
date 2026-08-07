@@ -30,6 +30,14 @@ test("skill requires common vocabulary and clear review findings", async () => {
   assert.match(skill, /consequence before the internal cause/);
 });
 
+test("skill applies to development communication by default", async () => {
+  const skill = await read("packages/skills/simple-technical-writing/SKILL.md");
+  assert.match(skill, /Apply this skill to all human-readable technical communication/);
+  assert.match(skill, /coding, debugging, analysis, testing, and operations/);
+  assert.match(skill, /Do not wait for the user to request clearer prose/);
+  assert.doesNotMatch(skill, /Do not activate this skill only because/);
+});
+
 test("skill package metadata is aligned", async () => {
   const packageJson = JSON.parse(
     await read("packages/skills/simple-technical-writing/package.json"),
@@ -39,13 +47,13 @@ test("skill package metadata is aligned", async () => {
   );
   const skill = await read("packages/skills/simple-technical-writing/SKILL.md");
 
-  assert.equal(packageJson.version, "0.0.2");
-  assert.equal(manifest.version, "0.0.2");
+  assert.equal(packageJson.version, "0.0.3");
+  assert.equal(manifest.version, "0.0.3");
   assert.equal(manifest.name, packageJson.name);
   assert.equal(manifest.entrypoints.skill, "./SKILL.md");
   assert.match(skill, /^name: diego-simple-technical-writing$/m);
   assert.doesNotMatch(skill, /^version:/m);
-  assert.match(skill, /^  version: "0\.0\.2"$/m);
+  assert.match(skill, /^  version: "0\.0\.3"$/m);
 });
 
 test("workflow consumes the skill", async () => {
@@ -82,14 +90,14 @@ test("development profile defines agent-specific instructions", async () => {
   const codex = await read("packages/profiles/development/AGENTS.md");
 
   assert.equal(packageJson.name, "@diego/development-profile");
-  assert.equal(packageJson.version, "0.0.1");
-  assert.equal(packageJson.dependencies["@diego/simple-technical-writing"], "workspace:^");
+  assert.equal(packageJson.version, "0.0.2");
+  assert.equal(packageJson.dependencies["@diego/simple-technical-writing"], "workspace:~");
   assert.equal(manifest.kind, "profile");
   assert.equal(manifest.name, packageJson.name);
   assert.equal(manifest.version, packageJson.version);
   assert.equal(manifest.entrypoints.claude, "./CLAUDE.md");
   assert.equal(manifest.entrypoints.codex, "./AGENTS.md");
-  assert.equal(manifest.dependencies["@diego/simple-technical-writing"], "^0.0.2");
+  assert.equal(manifest.dependencies["@diego/simple-technical-writing"], "~0.0.3");
   assert.match(claude, /^@~\/\.claude\/skills\/diego-simple-technical-writing\/SKILL\.md$/m);
   assert.match(codex, /read and follow `~\/\.codex\/skills\/diego-simple-technical-writing\/SKILL\.md`/);
   assert.match(claude, /Do not add co-author trailers/);

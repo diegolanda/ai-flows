@@ -49,8 +49,8 @@ if (profile.name !== "@diego/development-profile") {
   throw new Error("Unexpected profile package name.");
 }
 
-if (profile.dependencies?.[skill.name] !== "workspace:^") {
-  throw new Error("The development profile must use the local skill through workspace:^.");
+if (profile.dependencies?.[skill.name] !== "workspace:~") {
+  throw new Error("The development profile must use the local skill through workspace:~.");
 }
 
 if (workflow.dependencies?.[skill.name] !== "workspace:^") {

@@ -2,7 +2,9 @@
 
 An OakShelf skill that writes, rewrites, or reviews technical prose in clear, direct English.
 
-Use it when you want technical text that is concise, consistent, and easier to translate.
+The skill applies by default to human-readable communication during software development.
+
+It covers coding, debugging, analysis, testing, and operations. It does not apply its prose rules to source code.
 
 The skill prefers common words for general language. It explains necessary technical terms when they first appear.
 

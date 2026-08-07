@@ -11,7 +11,7 @@ importers:
   packages/profiles/development:
     dependencies:
       '@diego/simple-technical-writing':
-        specifier: workspace:^
+        specifier: workspace:~
         version: link:../../skills/simple-technical-writing
 
   packages/skills/simple-technical-writing: {}
