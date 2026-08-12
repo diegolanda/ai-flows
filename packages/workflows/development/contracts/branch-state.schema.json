@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/branch-state.schema.json",
+  "title": "Branch state",
+  "description": "Branch-specific workflow state stored at <git-dir>/oakshelf/development/<branch-safe-id>.json. Only the branch-state tool writes this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "branch",
+    "baseBranch",
+    "rawIntent",
+    "intent",
+    "intentHash",
+    "intentLocked",
+    "descriptionStale",
+    "reviewStale"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseBranch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rawIntent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The developer's original request, unmodified."
+    },
+    "intent": {
+      "type": ["string", "null"],
+      "description": "The normalized intent. Null until the development-intent skill produces it."
+    },
+    "intentHash": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Hash of the canonical intent text. Null until the intent is locked."
+    },
+    "intentLocked": {
+      "type": "boolean"
+    },
+    "intentApprovedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Set by the branch-state tool when the intent is locked."
+    },
+    "descriptionStale": {
+      "type": "boolean"
+    },
+    "reviewStale": {
+      "type": "boolean"
+    },
+    "lastReviewedHead": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The commit the last passing review evaluated. Review is stale when HEAD differs."
+    },
+    "lastReviewStatus": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "Result of the last review, valid only for lastReviewedHead."
+    },
+    "pullRequest": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The PR number for this branch, when one exists."
+    }
+  }
+}

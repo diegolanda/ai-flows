@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/description.schema.json",
+  "title": "PR description",
+  "description": "Output of the @diego/pr-description skill. This schema deliberately has no intent field, so the skill cannot replace the locked intent through its normal output channel.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["description", "covered", "skipped", "assumptions", "deviations"],
+  "properties": {
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the current implementation does, in simple technical English."
+    },
+    "covered": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Intent requirements the implementation satisfies."
+    },
+    "skipped": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Intent requirements the implementation does not satisfy yet."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Assumptions the implementation relies on."
+    },
+    "deviations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Intentional differences from the locked intent."
+    }
+  }
+}

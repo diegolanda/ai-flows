@@ -18,7 +18,9 @@
     "oakshelf.json",
     "WORKFLOW.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "PRD.md",
+    "contracts"
   ],
   "dependencies": {
     "@diego/simple-technical-writing": "workspace:^"

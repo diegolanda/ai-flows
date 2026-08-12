@@ -37,7 +37,7 @@ small repository adapter
         |      - inspect Git state
         |      - inspect package scripts
         |      - run gates
-        |      - call Codex
+        |      - manage branch state
         |      - call gh
         |
         +--> delivery orchestration
@@ -50,6 +50,19 @@ small repository adapter
                - PR sync
                - CI watch
 ```
+
+### 1.1 Execution model
+
+The OakShelf CLI does not execute workflows and this PRD does not require it to. The division of responsibility is:
+
+- `oak sync` distributes the workflow, its skills, and its tool packages into the agent, the same way it distributes profiles and skills today.
+- The coding agent (Codex or Claude Code) is the workflow engine. After sync, `WORKFLOW.md` becomes instructions the agent follows. The agent orchestrates the pipeline and applies the skills itself.
+- Tool packages provide deterministic scripts. The agent executes them through its shell tool. Exit codes and structured JSON output decide pass or fail.
+- Git hooks run only deterministic scripts. Hooks never invoke a model.
+
+The only expected OakShelf changes are distribution-side: manifest schema support for the new package shapes, such as an `oakshelf.json` for tool packages, declared schemas, and declared executable files.
+
+The agent must never hand-edit workflow state. All state transitions go through a deterministic state script, so locking, hashing, and staleness stay verifiable even though an agent drives them.
 
 ## 2. Problem
 
@@ -75,7 +88,7 @@ Repository gates are also fragmented. Developers may run tests, lint, build, reb
 6. Run deterministic repository gates before delivery.
 7. Keep Git hooks small and declarative.
 8. Package reusable behavior as OakShelf skills and tools rather than copying logic into each application repository.
-9. Support Codex first while preserving an adapter boundary for Claude Code or another execution harness later.
+9. Run inside the synced coding agent, Codex first, while keeping skill and tool contracts agent-neutral so Claude Code or another harness can execute the same workflow.
 10. Provide a terminal pipeline view similar to a local CI runner.
 
 ### 3.2 Secondary goals
@@ -157,12 +170,12 @@ Git hooks can be bypassed. Required enforcement must eventually be repeatable as
 
 The preferred flow captures intent before implementation:
 
-```bash
-oak run @diego/development start \
-  "Prevent nil errors when users have no organization"
+```text
+Developer: start a task — prevent nil errors when users have no organization
+Agent:     runs the workflow "start" action and records the raw intent
 ```
 
-The workflow records local task state associated with the current branch.
+The agent follows the `start` action defined in `WORKFLOW.md`. It calls the state script, which records local task state associated with the current branch.
 
 Example state:
 
@@ -177,17 +190,11 @@ Example state:
 }
 ```
 
-The exact OakShelf execution syntax may change as workflow execution becomes stable. The important requirement is that the capability belongs to the OakShelf workflow and is not implemented independently in every target repository.
+The important requirement is that the capability belongs to the OakShelf workflow and is not implemented independently in every target repository.
 
 ### 6.2 Creating a PR
 
-The developer runs the workflow's PR delivery command.
-
-Conceptually:
-
-```bash
-oak run @diego/development pr
-```
+The developer asks the agent to deliver the branch. The agent follows the `pr` action defined in `WORKFLOW.md`.
 
 The pipeline performs:
 
@@ -258,6 +265,14 @@ No authorization behavior was changed.
 
 The intent hash is workflow metadata, not the security boundary. It detects accidental or unauthorized workflow-level mutation but does not replace server-side enforcement.
 
+The hash is calculated over a canonical form of the intent text, because GitHub and editors can change line endings and trailing whitespace. The canonicalization rule is defined in `contracts/CONTRACTS.md`:
+
+1. Encode the text as UTF-8.
+2. Convert CRLF and CR line endings to LF.
+3. Remove trailing whitespace from each line.
+4. Remove leading and trailing blank lines.
+5. Calculate SHA-256 and store it as `sha256:<hex>`.
+
 ## 7. OakShelf package architecture
 
 The workflow should be composed from small packages instead of becoming one large prompt.
@@ -287,10 +302,12 @@ packages/
   tools/
     git-repository/
     github-cli/
-    codex-exec/
+    branch-state/
     quality-gates/
     pipeline-ui/
 ```
+
+A `codex-exec` tool for headless model invocation is deferred. See section 9.2.1.
 
 ### Important compatibility boundary
 
@@ -423,20 +440,34 @@ The Git tool must never perform a rebase from a `pre-push` hook.
 
 If a direct `git push` detects that the branch is behind the configured base branch, it should fail and tell the developer to run the OakShelf delivery command.
 
-### 9.2 `codex-exec`
+### 9.2 `branch-state`
+
+The state script is the only writer of workflow state. The agent calls it and never edits state files directly.
 
 Responsibilities:
 
-- invoke Codex non-interactively;
-- pass prompts and context through stdin or files;
-- force read-only sandboxing for review/generation steps when possible;
-- request structured JSON output;
-- validate model output against a JSON Schema;
-- expose stdout/stderr and timing events;
-- return normalized exit status;
-- avoid giving Codex mutation capabilities during review.
+- read and write the branch state file described in section 10;
+- resolve the state directory through `git rev-parse --git-dir` so linked worktrees work;
+- record raw intent;
+- lock intent: canonicalize, hash, store the approval timestamp;
+- mark description and review stale;
+- record `lastReviewedHead` and invalidate review results when HEAD changes;
+- validate every write against the branch state JSON Schema;
+- expose read results as JSON.
 
-The abstraction should support a future provider adapter:
+### 9.2.1 `codex-exec` (deferred)
+
+In V1 the synced agent performs intent normalization, description writing, and review directly. No headless model invocation is needed, so this package is deferred.
+
+It becomes necessary only when a stage must run without an interactive agent, for example CI parity (section 20). Its deferred responsibilities:
+
+- invoke a model CLI non-interactively;
+- force read-only sandboxing for review and generation steps when possible;
+- request structured JSON output and validate it against a JSON Schema;
+- return a normalized exit status;
+- avoid giving the model mutation capabilities during review.
+
+The abstraction should support a provider adapter:
 
 ```ts
 interface AgentExecutor {
@@ -444,15 +475,10 @@ interface AgentExecutor {
 }
 ```
 
-V1 provider:
+Possible providers:
 
 ```text
 Codex CLI
-```
-
-Possible later providers:
-
-```text
 Claude Code
 Gemini CLI
 OpenCode
@@ -477,11 +503,16 @@ The first implementation should shell out to `gh` instead of adding a separate G
 Responsibilities:
 
 - execute explicitly configured commands;
-- detect whether an optional package script exists;
+- detect whether a configured package script exists;
 - stream output;
 - collect duration and result;
 - stop on required gate failure;
 - never run arbitrary scripts merely because they exist.
+
+Each gate has two independent flags:
+
+- `required`: if `true`, a gate failure blocks delivery. If `false`, a failure is reported but does not block.
+- `skipIfMissing`: if `true`, a missing package script skips the gate. If `false`, a missing script is a failure.
 
 Default recommended gates:
 
@@ -498,10 +529,10 @@ Example repository configuration:
 {
   "baseBranch": "main",
   "gates": [
-    { "name": "Test", "script": "test", "optional": true },
-    { "name": "Typecheck", "script": "typecheck", "optional": true },
-    { "name": "Lint", "script": "lint", "optional": true },
-    { "name": "Build", "script": "build", "optional": true }
+    { "name": "Test", "script": "test", "required": true, "skipIfMissing": true },
+    { "name": "Typecheck", "script": "typecheck", "required": true, "skipIfMissing": true },
+    { "name": "Lint", "script": "lint", "required": true, "skipIfMissing": true },
+    { "name": "Build", "script": "build", "required": true, "skipIfMissing": true }
   ]
 }
 ```
@@ -536,10 +567,14 @@ Task state should be local and branch-specific.
 Recommended initial storage:
 
 ```text
-.git/oakshelf/development/<branch-safe-id>.json
+<git-dir>/oakshelf/development/<branch-safe-id>.json
 ```
 
+`<git-dir>` is the result of `git rev-parse --git-dir`. Do not assume that `.git` is a directory, because in a linked worktree `.git` is a file.
+
 This state must not be committed by default.
+
+Only the `branch-state` tool writes this file. The file is validated against the branch state JSON Schema on every write.
 
 Example:
 
@@ -562,15 +597,17 @@ Example:
 
 No secrets should be stored in this file.
 
-## 11. Intent change flow
+## 11. Intent approval and change flow
 
-Changing intent must be a first-class action.
+### 11.1 Approval
 
-Conceptual command:
+Intent approval is a conversational confirmation. The agent presents the normalized intent, and the developer approves it in the conversation. After the developer approves, the agent calls the `branch-state` tool to lock the intent.
 
-```bash
-oak run @diego/development intent edit
-```
+The lock itself is deterministic: the state script canonicalizes the text, calculates the hash, and records the approval timestamp. The agent cannot mark an intent as locked without going through the state script.
+
+### 11.2 Changing a locked intent
+
+Changing intent must be a first-class action. The developer asks the agent to edit the intent, and the agent follows the `intent edit` action defined in `WORKFLOW.md`.
 
 The workflow should show the previous and proposed intent and require explicit approval.
 
@@ -626,20 +663,22 @@ The hook cannot reject the already-created commit, so it should remain cheap and
 
 ### 12.3 `pre-push`
 
+The hook runs deterministic checks only. It never invokes a model.
+
 The hook should:
 
 1. verify branch/base relationship;
 2. fail if a rebase is required;
-3. refresh description if stale;
-4. run intent review;
+3. fail if intent is not locked;
+4. fail if description or review is stale, and tell the developer to run the delivery flow in the agent;
 5. run configured deterministic gates;
 6. allow Git push only if blocking stages pass.
 
-It must not rewrite branch history.
+It must not rewrite branch history. It must not refresh the description or run the AI review, because those stages need a model. The agent-driven delivery flow performs them and records the results in branch state. The hook only verifies that the recorded results are fresh for the current HEAD.
 
-### 12.4 OakShelf delivery command
+### 12.4 Delivery flow
 
-The mutation-safe delivery path may:
+The mutation-safe delivery path is the agent-driven `pr` action. It may:
 
 1. fetch;
 2. rebase onto the configured base;
@@ -669,10 +708,10 @@ Example:
 Example hook:
 
 ```sh
-pnpm exec oak run @diego/development hook pre-push
+pnpm exec oakshelf-dev-hook pre-push
 ```
 
-The exact command depends on OakShelf workflow execution support. No target repository should copy the implementation of intent generation, review, Codex invocation, GitHub integration, or pipeline rendering.
+`oakshelf-dev-hook` is a deterministic hook runner provided by the tool packages. Its final name is decided in Phase 2. It contains no AI logic. The exact resolution mechanism depends on how `oak sync` places tool packages in a target repository. No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
 
 ## 14. Configuration
 
@@ -685,14 +724,13 @@ Proposed repository-level configuration:
   "workflow": "@diego/development",
   "baseBranch": "auto",
   "review": {
-    "provider": "codex",
     "failOn": ["high", "critical"]
   },
   "gates": [
-    { "name": "Test", "script": "test", "optional": true },
-    { "name": "Typecheck", "script": "typecheck", "optional": true },
-    { "name": "Lint", "script": "lint", "optional": true },
-    { "name": "Build", "script": "build", "optional": true }
+    { "name": "Test", "script": "test", "required": true, "skipIfMissing": true },
+    { "name": "Typecheck", "script": "typecheck", "required": true, "skipIfMissing": true },
+    { "name": "Lint", "script": "lint", "required": true, "skipIfMissing": true },
+    { "name": "Build", "script": "build", "required": true, "skipIfMissing": true }
   ]
 }
 ```
@@ -718,9 +756,7 @@ The existing `@diego/development-profile` may later establish persistent coding-
 
 The workflow must distinguish managed and unmanaged sections.
 
-V1 may own the complete PR body if the repository explicitly opts in.
-
-Preferred later behavior is managed markers:
+V1 uses managed markers from the start. Markers are cheap to implement and avoid a later migration of existing PR bodies:
 
 ```md
 <!-- oak:managed:intent:start -->
@@ -775,7 +811,17 @@ Provide the original purpose or explicitly approve an inferred intent before del
 
 Branch is 3 commits behind origin/main.
 
-Run the OakShelf development delivery command so the workflow can rebase before pushing.
+Ask the agent to run the delivery flow so the workflow can rebase before pushing.
+```
+
+### Stale review at push time
+
+```text
+✗ Review stale
+
+HEAD changed after the last review.
+
+Ask the agent to run the delivery flow so the review can run against the current commit.
 ```
 
 ### Review failure
@@ -789,11 +835,11 @@ src/user.ts:42
 The nil guard changes authorization behavior, but the locked intent requires authorization behavior to remain unchanged.
 ```
 
-### Missing optional gate
+### Skipped gate
 
 ```text
 - Typecheck        skipped
-  No configured typecheck script exists.
+  No typecheck script exists and the gate allows skipIfMissing.
 ```
 
 ## 19. Security and trust boundaries
@@ -804,7 +850,7 @@ The nil guard changes authorization behavior, but the locked intent requires aut
 - Intent approval must require direct user action.
 - Local intent hashes detect workflow mutation but do not prove authenticity.
 - Required organization-level enforcement belongs in CI/branch protection.
-- `gh` and Codex authentication should use the user's existing local authentication mechanisms.
+- `gh` and agent authentication should use the user's existing local authentication mechanisms.
 - The workflow must not read or print repository secrets unless explicitly required by a configured command.
 - Logs should avoid dumping environment variables.
 
@@ -830,9 +876,11 @@ Deliverables:
 
 - this PRD;
 - package boundaries;
-- JSON schemas for intent, description, and review;
-- workflow event contract;
-- repository config contract.
+- JSON Schemas for intent, description, review, repository config, and branch state;
+- the intent canonicalization and hash rule;
+- workflow event contract.
+
+The contracts live in `packages/workflows/development/contracts/`.
 
 ### Phase 1 — Skills
 
@@ -859,20 +907,26 @@ Add workspace packages:
 
 ```text
 packages/tools/git-repository
-packages/tools/codex-exec
+packages/tools/branch-state
 packages/tools/github-cli
 packages/tools/quality-gates
 ```
 
-These may initially be internal npm/workspace packages rather than OakShelf package kinds.
+These may initially be internal npm/workspace packages rather than OakShelf package kinds. `codex-exec` is deferred until a stage must run without an interactive agent.
 
-Update `pnpm-workspace.yaml` to include `packages/tools/*` only when this phase begins.
+Update `pnpm-workspace.yaml` to include `packages/tools/*` when this phase begins. Update the root `check` script, or make `scripts/check-workspace.mjs` discover packages, so the new packages are validated.
+
+Test strategy:
+
+- `git-repository` and `branch-state`: `node --test` against temporary Git repositories, including a linked worktree case;
+- `github-cli`: a stubbed `gh` executable on `PATH`;
+- `quality-gates`: fixture packages with passing, failing, and missing scripts.
 
 ### Phase 3 — Workflow orchestration
 
-Replace the current development workflow scaffold with executable orchestration that composes the skills and tool packages.
+Rewrite `WORKFLOW.md` from a scaffold into an executable agent playbook. For each action it must define which tool scripts to run, in what order, how to interpret their JSON output, and the fail-closed rules from section 18.
 
-Add commands/actions equivalent to:
+Define actions equivalent to:
 
 ```text
 start
@@ -880,10 +934,9 @@ check
 push
 pr
 intent edit
-hook pre-commit
-hook post-commit
-hook pre-push
 ```
+
+Hook behavior (`pre-commit`, `post-commit`, `pre-push`) is implemented by the deterministic hook runner from the tool packages, not by the agent.
 
 ### Phase 4 — TUI
 
@@ -893,13 +946,13 @@ Do not couple workflow correctness to TTY rendering.
 
 ### Phase 5 — Husky installer
 
-Provide an explicit setup action that can add or update minimal hooks in a target repository.
+Provide an explicit `setup` action that can add or update minimal hooks in a target repository and write a starter `.oakshelf/development.json`.
 
-The installer must show what it will modify before changing existing hooks.
+The installer is a deterministic script in the tool packages. The agent can invoke it, but it must show what it will modify before changing existing hooks.
 
 ### Phase 6 — CI parity
 
-Add a GitHub Action or reusable CI integration based on the same contracts.
+Add a GitHub Action or reusable CI integration based on the same contracts. This phase introduces `codex-exec`, because review in CI runs without an interactive agent.
 
 ### Phase 7 — OakShelf native tools
 
@@ -913,15 +966,15 @@ V1 is complete when a developer can use the workflow in a real repository and de
 
 1. A task intent is captured before PR creation.
 2. Intent is normalized using the dedicated skill.
-3. The developer explicitly approves intent.
+3. The developer approves intent in conversation, and the agent locks it through the state script.
 4. Intent is locked and receives a deterministic hash.
 5. A PR body is generated with `Intent` and `Description`.
 6. A later commit marks description and review stale.
 7. The next delivery refreshes Description without changing Intent.
-8. Codex reviews the current diff against locked Intent.
+8. The synced agent reviews the current diff against locked Intent and records the result through the state script.
 9. A high-severity review finding blocks delivery.
 10. Configured tests/lint/build gates execute.
-11. Missing optional gates are skipped rather than failing.
+11. Gates with `skipIfMissing` are skipped when their script is missing, rather than failing.
 12. A branch behind base is rejected from direct `pre-push` rather than rebased inside the hook.
 13. The explicit delivery workflow can fetch and rebase before gates.
 14. The workflow can create or update the PR through `gh`.
@@ -949,31 +1002,37 @@ Possible later quantitative metrics:
 
 ## 24. Open questions
 
-1. What execution contract should OakShelf expose for workflows: declarative steps, executable entrypoint, or both?
-2. Should task state live under `.git/oakshelf`, an OakShelf global state directory, or both?
-3. Should an approved intent baseline also be persisted remotely in a bot-owned PR comment for CI verification?
-4. What is the final OakShelf model for first-class executable tools?
-5. Should the workflow invoke provider CLIs directly or resolve providers through an OakShelf tool abstraction?
-6. Should the PR Description be regenerated completely or patched incrementally?
-7. Should local review findings be posted to the PR automatically, or only block locally in V1?
-8. How should monorepos map changed files to package-specific gates?
-9. Should gate results be cached by HEAD SHA to avoid rerunning expensive builds when nothing changed?
-10. What explicit approval UX should OakShelf provide for intent changes when invoked non-interactively?
+Resolved:
+
+1. ~~What execution contract should OakShelf expose for workflows?~~ Resolved: the agent executes the workflow. `oak sync` only distributes packages. See section 1.1.
+2. ~~What approval UX applies to intent changes?~~ Resolved: approval is a conversational confirmation with the agent, and the lock is recorded by the deterministic state script. Hooks never need interactive approval because they never invoke a model. See section 11.
+3. ~~Should the workflow invoke provider CLIs directly?~~ Resolved for V1: no. The synced agent performs the AI stages itself. Headless provider invocation returns with `codex-exec` in Phase 6.
+
+Open:
+
+1. Should task state live under the Git directory, an OakShelf global state directory, or both?
+2. Should an approved intent baseline also be persisted remotely in a bot-owned PR comment for CI verification?
+3. What is the final OakShelf model for first-class executable tools, and where does `oak sync` place executable files in a target repository?
+4. Should the PR Description be regenerated completely or patched incrementally?
+5. Should local review findings be posted to the PR automatically, or only block locally in V1?
+6. How should monorepos map changed files to package-specific gates?
+7. Should gate results be cached by HEAD SHA to avoid rerunning expensive builds when nothing changed?
 
 ## 25. Recommended V1 scope decision
 
 The first implementation should stay deliberately narrow:
 
 ```text
-Codex only
+agent-executed workflow (Codex first, Claude Code compatible)
 GitHub only
 pnpm/npm-script gates
 main/master base branch detection
 local branch state
 Intent + Description PR contract
-intent-based review
+intent-based review by the synced agent
+deterministic-only Git hooks
 Husky adapter
-plain CLI first
+plain log output first
 TUI second
 ```
 

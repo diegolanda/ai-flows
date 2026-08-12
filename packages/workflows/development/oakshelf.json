@@ -10,7 +10,14 @@
   "files": [
     "WORKFLOW.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "PRD.md",
+    "contracts/CONTRACTS.md",
+    "contracts/intent.schema.json",
+    "contracts/description.schema.json",
+    "contracts/review.schema.json",
+    "contracts/repository-config.schema.json",
+    "contracts/branch-state.schema.json"
   ],
   "dependencies": {
     "@diego/simple-technical-writing": "^0.0.2"

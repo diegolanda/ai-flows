@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/review.schema.json",
+  "title": "Intent review",
+  "description": "Output of the @diego/intent-review skill.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "findings"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "fail when at least one finding matches the configured failOn severities."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "message", "intentRelation"],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Repository-relative path, when the finding anchors to a file."
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-indexed line number, when the finding anchors to a line."
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The consequence first, then the internal cause."
+          },
+          "intentRelation": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Which part of the locked intent this finding contradicts, misses, or exceeds."
+          }
+        }
+      }
+    }
+  }
+}

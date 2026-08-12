@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/intent.schema.json",
+  "title": "Development intent",
+  "description": "Output of the @diego/development-intent skill.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["intent", "goals", "nonGoals", "assumptions"],
+  "properties": {
+    "intent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The normalized purpose of the change in simple technical English."
+    },
+    "goals": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Outcomes the change must achieve."
+    },
+    "nonGoals": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Outcomes the change must not attempt."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Scope the skill inferred beyond the raw request. Inferred scope must appear here, not in intent."
+    }
+  }
+}
