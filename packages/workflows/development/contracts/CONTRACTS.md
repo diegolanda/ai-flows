@@ -28,13 +28,15 @@ Calculate the hash over the canonical form of the intent text:
 
 Store the value as `sha256:<lowercase hex>`.
 
-The PR body embeds the value as an HTML comment:
+The PR body embeds the value as an HTML comment inside the managed intent section:
 
 ```md
 <!-- oak:intent-sha256=<lowercase hex> -->
 ```
 
-The hash is workflow metadata, not a security boundary. Server-side enforcement belongs in CI.
+The managed intent section renders the canonical form of the intent text, so the published text is exactly the text the hash covers. Verifiers must read the hash comment from inside the managed intent section, not from anywhere else in the body.
+
+The hash is workflow metadata, not a security boundary. It detects accidental or unilateral edits. It does not detect a deliberate rewrite that also updates the hash comment, because the hash lives in the same mutable body. Server-side enforcement against an external baseline belongs in CI and is an open question in the PRD.
 
 ## Branch state rules
 
@@ -58,11 +60,11 @@ stage.skipped      { stage, reason }
 pipeline.completed { status }
 ```
 
-`stage` is one of:
+The event names and payload shapes are the stable contract. `stage` is the display name of the pipeline stage. Gate stages use the configured gate `name`. Renderers must treat `stage` as opaque text. The recommended stage names for the delivery pipeline are:
 
 ```text
-fetch, rebase, intent, intent-approval, description, review,
-test, typecheck, lint, build, push, pr, ci
+Fetch, Rebase, Branch, Base, Intent, Freshness, Description, Review,
+Test, Typecheck, Lint, Build, Push, PR, CI
 ```
 
 ## Gate semantics

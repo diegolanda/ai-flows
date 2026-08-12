@@ -17,7 +17,8 @@
     "contracts/description.schema.json",
     "contracts/review.schema.json",
     "contracts/repository-config.schema.json",
-    "contracts/branch-state.schema.json"
+    "contracts/branch-state.schema.json",
+    "ci/github-intent-check.example.yml"
   ],
   "dependencies": {
     "@diego/simple-technical-writing": "^0.0.3",

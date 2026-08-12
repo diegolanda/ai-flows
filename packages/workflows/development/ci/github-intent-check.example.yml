@@ -1,0 +1,46 @@
+# Example GitHub Actions workflow for a target repository (PRD section 20).
+#
+# It runs the deterministic CI parity subset: intent hash integrity and the
+# configured gates, through the same tool packages the local workflow uses.
+# The model-based intent review stays local until codex-exec exists
+# (PRD section 21, Phase 6 note).
+#
+# The integrity check detects accidental or unilateral intent edits. It does
+# not detect a rewrite that also updates the hash comment, because the hash
+# lives in the PR body. An authoritative external baseline is an open
+# question in the PRD (section 24).
+#
+# Copy this file to .github/workflows/intent-check.yml in a repository set up
+# with the @diego/development workflow, where `pnpm exec oakshelf-dev-hook`
+# resolves. Mark the check as required in branch protection so GitHub stays
+# the authoritative enforcement layer.
+
+name: Intent check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify intent integrity and run gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: pnpm exec oakshelf-dev-hook ci-verify --pr ${{ github.event.pull_request.number }}

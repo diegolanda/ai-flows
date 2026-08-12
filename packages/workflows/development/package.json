@@ -20,7 +20,8 @@
     "README.md",
     "LICENSE",
     "PRD.md",
-    "contracts"
+    "contracts",
+    "ci"
   ],
   "dependencies": {
     "@diego/simple-technical-writing": "workspace:^",
