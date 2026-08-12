@@ -1,0 +1,44 @@
+{
+  "name": "@diego/pr-description",
+  "version": "0.0.1",
+  "description": "An OakShelf skill that describes the current implementation for a PR body without rewriting the locked intent.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegolanda/ai-flows.git",
+    "directory": "packages/skills/pr-description"
+  },
+  "homepage": "https://github.com/diegolanda/ai-flows/tree/main/packages/skills/pr-description#readme",
+  "bugs": {
+    "url": "https://github.com/diegolanda/ai-flows/issues"
+  },
+  "keywords": [
+    "oakshelf",
+    "skill",
+    "pull-request",
+    "description",
+    "ai"
+  ],
+  "files": [
+    "oakshelf.json",
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "evals"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@diego/simple-technical-writing": "workspace:^"
+  },
+  "oakshelf": {
+    "kind": "skill",
+    "manifest": "./oakshelf.json"
+  },
+  "scripts": {
+    "check": "node ../../../scripts/check-package.mjs . skill",
+    "pack:dry": "npm pack --dry-run"
+  }
+}

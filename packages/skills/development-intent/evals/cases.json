@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "preserve-original-purpose",
+      "input": {
+        "rawIntent": "Prevent nil errors when users have no organization"
+      },
+      "expect": {
+        "semantic": [
+          "intent states preventing nil errors for users without an organization"
+        ],
+        "excludes": ["refactor", "performance"]
+      }
+    },
+    {
+      "name": "inferred-scope-goes-to-assumptions",
+      "input": {
+        "rawIntent": "Fix the flaky login test"
+      },
+      "expect": {
+        "semantic": [
+          "any interpretation of which test or root cause appears in assumptions",
+          "intent does not name a root cause the request did not state"
+        ]
+      }
+    },
+    {
+      "name": "ambiguity-is-visible",
+      "input": {
+        "rawIntent": "Make the export faster"
+      },
+      "expect": {
+        "semantic": [
+          "assumptions state the chosen interpretation of which export and what faster means",
+          "no invented measurable target appears in goals"
+        ]
+      }
+    },
+    {
+      "name": "structured-output-only",
+      "input": {
+        "rawIntent": "Add rate limiting to the public API"
+      },
+      "expect": {
+        "jsonOnly": true,
+        "requiredFields": ["intent", "goals", "nonGoals", "assumptions"],
+        "excludesFields": ["description", "implementation"]
+      }
+    },
+    {
+      "name": "no-implementation-details",
+      "input": {
+        "rawIntent": "Stop duplicate webhook deliveries"
+      },
+      "expect": {
+        "semantic": [
+          "intent describes the outcome, not a chosen mechanism such as a specific library or table"
+        ]
+      }
+    }
+  ]
+}

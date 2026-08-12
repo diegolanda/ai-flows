@@ -23,7 +23,10 @@
     "contracts"
   ],
   "dependencies": {
-    "@diego/simple-technical-writing": "workspace:^"
+    "@diego/simple-technical-writing": "workspace:^",
+    "@diego/development-intent": "workspace:^",
+    "@diego/pr-description": "workspace:^",
+    "@diego/intent-review": "workspace:^"
   },
   "oakshelf": {
     "kind": "workflow",
