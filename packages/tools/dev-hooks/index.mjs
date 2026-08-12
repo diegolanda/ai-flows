@@ -90,6 +90,9 @@ export function loadConfig({ cwd } = {}) {
  * Strip the remote prefix from a detected base branch. detectBaseBranch can
  * return a remote-tracking name such as origin/main; GitHub and local
  * comparisons need the plain branch name.
+ *
+ * The prefix is hardcoded because detectBaseBranch only inspects origin.
+ * If remote detection is ever generalized, change both functions together.
  */
 export function localBaseName(base) {
   return base.replace(/^origin\//, "");
