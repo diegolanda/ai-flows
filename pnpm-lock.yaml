@@ -30,6 +30,34 @@ importers:
 
   packages/skills/simple-technical-writing: {}
 
+  packages/tools/branch-state: {}
+
+  packages/tools/dev-hooks:
+    dependencies:
+      '@diego/branch-state':
+        specifier: workspace:^
+        version: link:../branch-state
+      '@diego/git-repository':
+        specifier: workspace:^
+        version: link:../git-repository
+      '@diego/github-cli':
+        specifier: workspace:^
+        version: link:../github-cli
+      '@diego/pipeline-ui':
+        specifier: workspace:^
+        version: link:../pipeline-ui
+      '@diego/quality-gates':
+        specifier: workspace:^
+        version: link:../quality-gates
+
+  packages/tools/git-repository: {}
+
+  packages/tools/github-cli: {}
+
+  packages/tools/pipeline-ui: {}
+
+  packages/tools/quality-gates: {}
+
   packages/workflows/development:
     dependencies:
       '@diego/development-intent':
