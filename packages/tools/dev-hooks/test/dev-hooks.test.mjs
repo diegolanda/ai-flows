@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync, chmodSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -11,12 +11,14 @@ import {
   localBaseName,
   postCommit,
   prePush,
+  prSync,
   setup,
 } from "../index.mjs";
 import {
   initState,
   setIntent,
   lockIntent,
+  readState,
   recordDescription,
   recordReview,
   intentHash,
@@ -295,6 +297,120 @@ test("loadConfig rejects unknown fields and bad severities", () => {
     );
     assert.throws(() => loadConfig({ cwd: dir }), /review.failOn/);
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function makeGhStub({ prList = "[]", failLabelCreate = false } = {}) {
+  const dir = mkdtempSync(join(tmpdir(), "dev-hooks-gh-"));
+  const argsFile = join(dir, "argv.txt");
+  writeFileSync(argsFile, "");
+  const script = [
+    "#!/usr/bin/env bash",
+    `printf '%s\\n' "$*" >> "${argsFile}"`,
+    'case "$1 $2" in',
+    `  "pr list") cat "${join(dir, "pr-list.json")}" ;;`,
+    '  "pr create") echo "https://github.com/o/r/pull/9" ;;',
+    '  "pr view") echo "{\\"labels\\":[]}" ;;',
+    `  "label create") ${failLabelCreate ? "echo boom >&2; exit 1" : ":"} ;;`,
+    '  *) : ;;',
+    "esac",
+    "exit 0",
+    "",
+  ].join("\n");
+  writeFileSync(join(dir, "pr-list.json"), prList);
+  writeFileSync(join(dir, "gh"), script);
+  chmodSync(join(dir, "gh"), 0o755);
+  return {
+    dir,
+    calls: () => readFileSync(argsFile, "utf8").split("\n").filter(Boolean),
+    cleanup: () => rmSync(dir, { recursive: true, force: true }),
+  };
+}
+
+function prepareLockedState(dir, { size } = {}) {
+  initState({ cwd: dir, baseBranch: "main", rawIntent: "do the thing" });
+  setIntent({ cwd: dir, intent: "Do the thing safely.", ...(size ? { size } : {}) });
+  lockIntent({ cwd: dir });
+}
+
+async function withStubbedGh(stub, fn) {
+  const oldPath = process.env.PATH;
+  process.env.PATH = `${stub.dir}:${oldPath}`;
+  try {
+    return await fn();
+  } finally {
+    process.env.PATH = oldPath;
+  }
+}
+
+test("prSync creates the PR, records the number, and applies the size label", async () => {
+  const dir = makeRepo();
+  const stub = makeGhStub();
+  try {
+    prepareLockedState(dir, { size: "M" });
+    const result = await withStubbedGh(stub, () =>
+      prSync({ cwd: dir, title: "T", description: "D" }),
+    );
+    assert.equal(result.number, 9);
+    assert.deepEqual(result.sizeLabel, { added: "size/M", removed: [] });
+    assert.equal(readState({ cwd: dir }).pullRequest, 9);
+    assert.ok(stub.calls().some((c) => c.startsWith("label create size/M")));
+    assert.ok(stub.calls().some((c) => c.startsWith("pr edit 9 --add-label size/M")));
+  } finally {
+    stub.cleanup();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("prSync updates an existing PR and still applies the size label", async () => {
+  const dir = makeRepo();
+  const stub = makeGhStub({
+    prList: JSON.stringify([{ number: 4, url: "https://github.com/o/r/pull/4", body: "" }]),
+  });
+  try {
+    prepareLockedState(dir, { size: "XS" });
+    const result = await withStubbedGh(stub, () =>
+      prSync({ cwd: dir, title: "T", description: "D" }),
+    );
+    assert.equal(result.number, 4);
+    assert.deepEqual(result.sizeLabel, { added: "size/XS", removed: [] });
+    assert.ok(stub.calls().some((c) => c.startsWith("pr edit 4 --body-file")));
+  } finally {
+    stub.cleanup();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("prSync skips the label step when no intentSize is stored", async () => {
+  const dir = makeRepo();
+  const stub = makeGhStub();
+  try {
+    prepareLockedState(dir, {});
+    const result = await withStubbedGh(stub, () =>
+      prSync({ cwd: dir, title: "T", description: "D" }),
+    );
+    assert.equal(result.sizeLabel, null);
+    assert.ok(!stub.calls().some((c) => c.startsWith("label")));
+  } finally {
+    stub.cleanup();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a label failure does not fail prSync and the PR number is still recorded", async () => {
+  const dir = makeRepo();
+  const stub = makeGhStub({ failLabelCreate: true });
+  try {
+    prepareLockedState(dir, { size: "L" });
+    const result = await withStubbedGh(stub, () =>
+      prSync({ cwd: dir, title: "T", description: "D" }),
+    );
+    assert.equal(result.number, 9);
+    assert.match(result.sizeLabel.error, /label create/);
+    assert.equal(readState({ cwd: dir }).pullRequest, 9);
+  } finally {
+    stub.cleanup();
     rmSync(dir, { recursive: true, force: true });
   }
 });

@@ -272,11 +272,19 @@ export function prSync({ cwd, title, description } = {}) {
     number = created.number;
     url = created.url;
   }
+  branchState.setPullRequest({ cwd, number });
+
+  // The size label is non-blocking. The PR number is recorded before the
+  // label call, and a label failure is reported in the result instead of
+  // failing an otherwise successful sync. The next pr-sync retries it.
   let sizeLabel = null;
   if (state.intentSize) {
-    sizeLabel = applySizeLabel(number, state.intentSize, { cwd });
+    try {
+      sizeLabel = applySizeLabel(number, state.intentSize, { cwd });
+    } catch (error) {
+      sizeLabel = { error: error.message };
+    }
   }
-  branchState.setPullRequest({ cwd, number });
   return { number, url, sizeLabel };
 }
 

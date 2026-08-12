@@ -61,7 +61,7 @@ Use when the developer asks to deliver, push, or create the PR. Rebase happens o
    If the status is fail, stop. Report each blocking finding with its consequence, location, and intent relation. Do not push.
 6. **Gates**: `oakshelf-dev-hook gates`. If a required gate fails, stop and report the failing output.
 7. **Push**: `git push` (with `-u origin <branch>` on first push).
-8. **PR sync**: `oakshelf-dev-hook pr-sync --title "<title>"` with the description text on stdin. The tool renders the managed `Intent` and `Description` sections, preserves human-authored content, creates the PR when none exists, applies the `size/<size>` label from the stored intent size, and records the PR number in state.
+8. **PR sync**: `oakshelf-dev-hook pr-sync --title "<title>"` with the description text on stdin. The tool renders the managed `Intent` and `Description` sections, preserves human-authored content, creates the PR when none exists, records the PR number in state, and applies the `size/<size>` label from the stored intent size. A label failure does not fail the sync. When the result reports a label error, tell the developer and continue.
 9. **CI watch**: report the check status (`gh pr checks --watch`) unless the developer asked not to wait.
 10. Summarize the delivery: what was pushed, the PR URL, and any non-blocking findings.
 

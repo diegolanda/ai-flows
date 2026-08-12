@@ -75,6 +75,8 @@ The size is stored in branch state as `intentSize` when the intent is set. At PR
 
 When the intent changes through the edit flow, the size is re-estimated and the label follows on the next PR sync.
 
+The label step is non-blocking. PR sync records the PR number before it applies the label, and a label failure is reported in the sync result instead of failing the sync. The next PR sync retries the label.
+
 ## Gate semantics
 
 Each configured gate has two independent flags:
