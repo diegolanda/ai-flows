@@ -42,11 +42,24 @@ Return only a JSON object that matches this shape:
   "intent": "string",
   "goals": ["string"],
   "nonGoals": ["string"],
-  "assumptions": ["string"]
+  "assumptions": ["string"],
+  "size": "XS | S | M | L | XL"
 }
 ```
 
 The canonical schema is `contracts/intent.schema.json` in the `@diego/development` workflow package. Unknown fields are a validation failure.
+
+## Size estimate
+
+Estimate `size` from the approved scope, not from implementation effort or time:
+
+- `XS`: one small, well-localized change with no new behavior surface.
+- `S`: a single fix or small feature that touches a few files.
+- `M`: a feature that spans several modules or adds new tests and configuration.
+- `L`: a cross-cutting change that affects multiple subsystems or public contracts.
+- `XL`: a broad change such as a large feature, a migration, or an architectural shift. Suggest splitting the task when you estimate `XL`.
+
+The size is part of what the developer approves. When the goals change during the approval conversation, re-estimate the size before the lock.
 
 ## Rules
 
@@ -87,6 +100,7 @@ Output:
   ],
   "assumptions": [
     "The fix applies to user resolution paths only, because the request names no other flow."
-  ]
+  ],
+  "size": "S"
 }
 ```

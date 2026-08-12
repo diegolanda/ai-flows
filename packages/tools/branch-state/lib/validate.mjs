@@ -14,7 +14,9 @@ const REQUIRED_FIELDS = [
   'reviewStale',
 ];
 
-const OPTIONAL_FIELDS = ['intentApprovedAt', 'lastReviewedHead', 'lastReviewStatus', 'pullRequest'];
+const OPTIONAL_FIELDS = ['intentApprovedAt', 'intentSize', 'lastReviewedHead', 'lastReviewStatus', 'pullRequest'];
+
+const INTENT_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
 const ALLOWED_FIELDS = new Set([...REQUIRED_FIELDS, ...OPTIONAL_FIELDS]);
 
@@ -75,6 +77,10 @@ export function validateState(state) {
     if (!(value === null || (typeof value === 'string' && INTENT_HASH_PATTERN.test(value)))) {
       errors.push('"intentHash" must be null or match ^sha256:[0-9a-f]{64}$');
     }
+  }
+
+  if ('intentSize' in state && !INTENT_SIZES.includes(state.intentSize)) {
+    errors.push(`"intentSize" must be one of: ${INTENT_SIZES.join(', ')}`);
   }
 
   if ('intentLocked' in state && typeof state.intentLocked !== 'boolean') {

@@ -9,7 +9,7 @@ oakshelf-dev-hook pre-commit    Fast deterministic checks. Currently a pass-thro
 oakshelf-dev-hook post-commit   Marks description and review stale. Never blocks.
 oakshelf-dev-hook pre-push      Verifies base relationship, intent lock, freshness, and gates.
 oakshelf-dev-hook gates         Runs the configured gates only.
-oakshelf-dev-hook pr-sync       Creates or updates the PR with managed sections. Description on stdin.
+oakshelf-dev-hook pr-sync       Creates or updates the PR with managed sections and the size label. Description on stdin.
 oakshelf-dev-hook ci-verify     Verifies PR intent integrity and runs gates. For CI.
 oakshelf-dev-hook setup         Plans the repository adapter files. Pass --write to apply.
 ```

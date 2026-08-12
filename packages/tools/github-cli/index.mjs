@@ -111,6 +111,61 @@ export function checkStatus(number, opts = {}) {
   }));
 }
 
+const SIZE_LABEL_PREFIX = 'size/';
+const SIZE_LABELS = ['XS', 'S', 'M', 'L', 'XL'];
+const SIZE_LABEL_COLORS = { XS: '0e8a16', S: '5eba3f', M: 'fbca04', L: 'd93f0b', XL: 'b60205' };
+
+/**
+ * Read the label names currently on a pull request.
+ */
+export function getPullRequestLabels(number, opts = {}) {
+  const stdout = runGh(['pr', 'view', String(number), '--json', 'labels'], opts);
+  const data = JSON.parse(stdout);
+  if (!Array.isArray(data.labels)) {
+    return [];
+  }
+  return data.labels.map((label) => label.name);
+}
+
+/**
+ * Make sure a label exists in the repository. `--force` updates the color
+ * and description when the label already exists, so the call is idempotent.
+ */
+export function ensureLabel(name, { color, description } = {}, opts = {}) {
+  const args = ['label', 'create', name, '--force'];
+  if (color) {
+    args.push('--color', color);
+  }
+  if (description) {
+    args.push('--description', description);
+  }
+  runGh(args, opts);
+}
+
+/**
+ * Apply the size label for the given size to a pull request and remove any
+ * other size label. The size value must be one of XS, S, M, L, XL.
+ */
+export function applySizeLabel(number, size, opts = {}) {
+  if (!SIZE_LABELS.includes(size)) {
+    throw new Error(`Unknown size "${size}". Expected one of: ${SIZE_LABELS.join(', ')}.`);
+  }
+  const target = `${SIZE_LABEL_PREFIX}${size}`;
+  ensureLabel(
+    target,
+    { color: SIZE_LABEL_COLORS[size], description: `Approved intent scope: ${size}` },
+    opts,
+  );
+  const current = getPullRequestLabels(number, opts);
+  const stale = current.filter((name) => name.startsWith(SIZE_LABEL_PREFIX) && name !== target);
+  const args = ['pr', 'edit', String(number), '--add-label', target];
+  for (const name of stale) {
+    args.push('--remove-label', name);
+  }
+  runGh(args, opts);
+  return { added: target, removed: stale };
+}
+
 function intentSectionInner(intent, intentHash) {
   // The intent text is rendered verbatim. Callers must pass the canonical
   // form of the intent, because the recorded hash covers exactly that text.

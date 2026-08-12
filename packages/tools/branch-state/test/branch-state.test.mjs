@@ -252,3 +252,30 @@ test('worktree case: state for a linked worktree lands in that worktree git dir'
   const mainStateAttempt = readState({ cwd: repo, branch: 'feature/worktree-branch' });
   assert.equal(mainStateAttempt, null);
 });
+
+test('setIntent stores a size and editIntent updates it', () => {
+  const repo = makeRepo();
+  try {
+    initState({ cwd: repo, baseBranch: 'main', rawIntent: 'do the thing' });
+    let state = setIntent({ cwd: repo, intent: 'Do the thing.', size: 'S' });
+    assert.equal(state.intentSize, 'S');
+    lockIntent({ cwd: repo });
+    state = editIntent({ cwd: repo, intent: 'Do the bigger thing.', reason: 'scope grew', size: 'L' });
+    assert.equal(state.intentSize, 'L');
+  } finally {
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('validation rejects an invalid intentSize', () => {
+  const repo = makeRepo();
+  try {
+    initState({ cwd: repo, baseBranch: 'main', rawIntent: 'do the thing' });
+    assert.throws(
+      () => setIntent({ cwd: repo, intent: 'Do the thing.', size: 'HUGE' }),
+      /intentSize/,
+    );
+  } finally {
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});

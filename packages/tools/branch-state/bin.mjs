@@ -67,7 +67,7 @@ async function main() {
 
     case 'set-intent': {
       const intent = await readStdin();
-      const state = setIntent({ ...options, intent });
+      const state = setIntent({ ...options, intent, size: flags.size });
       printResult(state);
       return 0;
     }
@@ -80,7 +80,7 @@ async function main() {
 
     case 'edit-intent': {
       const intent = await readStdin();
-      const state = editIntent({ ...options, intent, reason: flags.reason });
+      const state = editIntent({ ...options, intent, reason: flags.reason, size: flags.size });
       printResult(state);
       return 0;
     }

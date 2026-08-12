@@ -46,6 +46,11 @@
     "intentLocked": {
       "type": "boolean"
     },
+    "intentSize": {
+      "type": "string",
+      "enum": ["XS", "S", "M", "L", "XL"],
+      "description": "Size estimate of the approved intent scope. Set with the intent and applied to the PR as a size label."
+    },
     "intentApprovedAt": {
       "type": "string",
       "format": "date-time",

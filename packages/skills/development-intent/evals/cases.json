@@ -44,8 +44,20 @@
       },
       "expect": {
         "jsonOnly": true,
-        "requiredFields": ["intent", "goals", "nonGoals", "assumptions"],
+        "requiredFields": ["intent", "goals", "nonGoals", "assumptions", "size"],
         "excludesFields": ["description", "implementation"]
+      }
+    },
+    {
+      "name": "size-reflects-scope",
+      "input": {
+        "rawIntent": "Fix the typo in the login button label"
+      },
+      "expect": {
+        "semantic": [
+          "size is XS or S because the approved scope is one small localized change",
+          "size does not reflect implementation time"
+        ]
       }
     },
     {

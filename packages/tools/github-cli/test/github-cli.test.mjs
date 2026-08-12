@@ -12,6 +12,7 @@ import {
   checkStatus,
   renderManagedBody,
   extractIntentHash,
+  applySizeLabel,
 } from '../index.mjs';
 
 /**
@@ -313,4 +314,28 @@ test("extractIntentHash ignores a hash comment outside the managed intent sectio
   });
   const spoofed = `<!-- oak:intent-sha256=${"c".repeat(64)} -->\n${body}`;
   assert.equal(extractIntentHash(spoofed), "b".repeat(64));
+});
+
+test('applySizeLabel ensures the label, adds it, and removes other size labels', (t) => {
+  const stub = makeGhStub({
+    stdout: JSON.stringify({ labels: [{ name: 'size/L' }, { name: 'bug' }] }),
+  });
+  t.after(() => stub.cleanup());
+
+  const result = applySizeLabel(7, 'M', { ghPath: stub.ghPath });
+
+  assert.deepEqual(result, { added: 'size/M', removed: ['size/L'] });
+  const args = stub.getArgs();
+  const createIdx = args.indexOf('label');
+  assert.deepEqual(args.slice(createIdx, createIdx + 3), ['label', 'create', 'size/M']);
+  assert.ok(args.includes('--force'));
+  const editIdx = args.lastIndexOf('edit');
+  const editArgs = args.slice(editIdx - 1);
+  assert.deepEqual(editArgs.slice(0, 3), ['pr', 'edit', '7']);
+  assert.ok(editArgs.includes('--add-label') && editArgs.includes('size/M'));
+  assert.ok(editArgs.includes('--remove-label') && editArgs.includes('size/L'));
+});
+
+test('applySizeLabel rejects an unknown size value', () => {
+  assert.throws(() => applySizeLabel(7, 'XXL', {}), /Unknown size/);
 });

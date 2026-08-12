@@ -118,6 +118,9 @@ export function setIntent(options = {}) {
   }
 
   state.intent = canonicalizeIntent(options.intent);
+  if (options.size !== undefined) {
+    state.intentSize = options.size;
+  }
   writeStateFile(file, state);
   return state;
 }
@@ -178,6 +181,9 @@ export function editIntent(options = {}) {
   state.intent = normalized;
   state.intentHash = intentHash(normalized);
   state.intentApprovedAt = new Date().toISOString();
+  if (options.size !== undefined) {
+    state.intentSize = options.size;
+  }
   state.descriptionStale = true;
   state.reviewStale = true;
 

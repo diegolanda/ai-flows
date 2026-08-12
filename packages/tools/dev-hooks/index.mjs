@@ -11,6 +11,7 @@ import {
   renderManagedBody,
   extractIntentHash,
   extractManagedSection,
+  applySizeLabel,
 } from "@diego/github-cli";
 
 const DEFAULT_GATES = [
@@ -271,8 +272,12 @@ export function prSync({ cwd, title, description } = {}) {
     number = created.number;
     url = created.url;
   }
+  let sizeLabel = null;
+  if (state.intentSize) {
+    sizeLabel = applySizeLabel(number, state.intentSize, { cwd });
+  }
   branchState.setPullRequest({ cwd, number });
-  return { number, url };
+  return { number, url, sizeLabel };
 }
 
 export function extractManagedIntent(body) {

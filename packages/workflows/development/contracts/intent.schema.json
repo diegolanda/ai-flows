@@ -5,12 +5,17 @@
   "description": "Output of the @diego/development-intent skill.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["intent", "goals", "nonGoals", "assumptions"],
+  "required": ["intent", "goals", "nonGoals", "assumptions", "size"],
   "properties": {
     "intent": {
       "type": "string",
       "minLength": 1,
       "description": "The normalized purpose of the change in simple technical English."
+    },
+    "size": {
+      "type": "string",
+      "enum": ["XS", "S", "M", "L", "XL"],
+      "description": "Estimated size of the approved scope, not of the eventual diff."
     },
     "goals": {
       "type": "array",

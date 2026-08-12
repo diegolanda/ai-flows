@@ -338,7 +338,8 @@ Output:
   "intent": "string",
   "goals": ["string"],
   "nonGoals": ["string"],
-  "assumptions": ["string"]
+  "assumptions": ["string"],
+  "size": "XS | S | M | L | XL"
 }
 ```
 
@@ -349,7 +350,10 @@ Requirements:
 - do not infer new scope without marking it as an assumption;
 - make ambiguity visible;
 - produce structured output;
-- allow the developer to approve the final result before locking it.
+- estimate `size` from the approved scope, not from the eventual diff or implementation time;
+- allow the developer to approve the final result, including the size, before locking it.
+
+The size is stored in branch state as `intentSize`. At PR sync, the workflow applies the label `size/<value>` to the PR and removes any other `size/` label. An intent edit re-estimates the size, and the label follows on the next PR sync.
 
 The skill may depend on `@diego/simple-technical-writing` for final prose normalization.
 
@@ -587,6 +591,7 @@ Example:
   "intent": "Prevent nil errors...",
   "intentHash": "sha256:...",
   "intentLocked": true,
+  "intentSize": "S",
   "intentApprovedAt": "2026-08-12T00:00:00Z",
   "descriptionStale": true,
   "reviewStale": true,

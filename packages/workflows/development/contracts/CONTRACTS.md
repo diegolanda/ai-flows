@@ -67,6 +67,14 @@ Fetch, Rebase, Branch, Base, Intent, Freshness, Description, Review,
 Test, Typecheck, Lint, Build, Push, PR, CI
 ```
 
+## Intent sizing
+
+The `@diego/development-intent` skill estimates a `size` for the approved scope: `XS`, `S`, `M`, `L`, or `XL`. The estimate reflects the scope the developer approved, not the eventual diff.
+
+The size is stored in branch state as `intentSize` when the intent is set. At PR sync, the workflow applies the label `size/<value>` to the PR and removes any other `size/` label. The label application is deterministic: the semantic judgment happens once, in the intent skill, and the developer approves it together with the intent.
+
+When the intent changes through the edit flow, the size is re-estimated and the label follows on the next PR sync.
+
 ## Gate semantics
 
 Each configured gate has two independent flags:
