@@ -67,17 +67,17 @@ Every mutating function throws an `Error` with a clear message when the requeste
 
 ## CLI
 
-The package exposes the `oakshelf-branch-state` binary as a thin wrapper over the API, for use from hooks and agents. Each subcommand accepts `--cwd <path>` and `--branch <name>` to override auto-detection. Output is JSON on stdout. The exit code is `0` on success and `1` on failure.
+The package exposes the `diego-branch-state` binary as a thin wrapper over the API, for use from hooks and agents. Each subcommand accepts `--cwd <path>` and `--branch <name>` to override auto-detection. Output is JSON on stdout. The exit code is `0` on success and `1` on failure.
 
 ```text
-oakshelf-branch-state read
-oakshelf-branch-state init --base-branch <name>          (reads rawIntent from stdin)
-oakshelf-branch-state set-intent                          (reads intent text from stdin)
-oakshelf-branch-state lock-intent
-oakshelf-branch-state edit-intent --reason <text>          (reads intent text from stdin)
-oakshelf-branch-state mark-stale
-oakshelf-branch-state record-description
-oakshelf-branch-state record-review --head <sha> --status <pass|fail>
-oakshelf-branch-state check-freshness
-oakshelf-branch-state set-pr --number <n>
+diego-branch-state read
+diego-branch-state init --base-branch <name>          (reads rawIntent from stdin)
+diego-branch-state set-intent                          (reads intent text from stdin)
+diego-branch-state lock-intent
+diego-branch-state edit-intent --reason <text>          (reads intent text from stdin)
+diego-branch-state mark-stale
+diego-branch-state record-description
+diego-branch-state record-review --head <sha> --status <pass|fail>
+diego-branch-state check-freshness
+diego-branch-state set-pr --number <n>
 ```

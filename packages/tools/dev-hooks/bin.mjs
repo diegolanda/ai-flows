@@ -83,7 +83,7 @@ async function main() {
     }
     default:
       process.stderr.write(
-        "Usage: oakshelf-dev-hook <pre-commit|post-commit|pre-push|gates|pr-sync|ci-verify|setup>\n",
+        "Usage: diego-dev-hook <pre-commit|post-commit|pre-push|gates|pr-sync|ci-verify|setup>\n",
       );
       return 1;
   }

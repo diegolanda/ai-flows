@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "@diego/branch-state",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "kind": "tool",
   "description": "Branch-specific workflow state: intent locking, canonical hashing, and staleness. The only writer of state files.",
   "entrypoints": {
@@ -11,7 +11,9 @@
     "TOOL.md",
     "README.md",
     "LICENSE",
-    "index.mjs", "bin.mjs", "lib/**"
+    "index.mjs",
+    "bin.mjs",
+    "lib/**"
   ],
   "dependencies": {}
 }

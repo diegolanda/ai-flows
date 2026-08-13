@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "@diego/dev-hooks",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "kind": "tool",
   "description": "Deterministic hook runner and delivery helpers: pre-push checks, gates, PR sync, CI verify, and the Husky installer.",
   "entrypoints": {
@@ -11,11 +11,12 @@
     "TOOL.md",
     "README.md",
     "LICENSE",
-    "index.mjs", "bin.mjs"
+    "index.mjs",
+    "bin.mjs"
   ],
   "dependencies": {
     "@diego/git-repository": "^0.0.1",
-    "@diego/branch-state": "^0.0.1",
+    "@diego/branch-state": "^0.0.2",
     "@diego/github-cli": "^0.0.1",
     "@diego/quality-gates": "^0.0.1",
     "@diego/pipeline-ui": "^0.0.1"

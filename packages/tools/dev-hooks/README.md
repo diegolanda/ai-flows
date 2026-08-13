@@ -5,13 +5,13 @@ The deterministic hook runner and delivery helper for the `@diego/development` w
 ## CLI
 
 ```text
-oakshelf-dev-hook pre-commit    Fast deterministic checks. Currently a pass-through.
-oakshelf-dev-hook post-commit   Marks description and review stale. Never blocks.
-oakshelf-dev-hook pre-push      Verifies base relationship, intent lock, freshness, and gates.
-oakshelf-dev-hook gates         Runs the configured gates only.
-oakshelf-dev-hook pr-sync       Creates or updates the PR with managed sections and the size label. Description on stdin.
-oakshelf-dev-hook ci-verify     Verifies PR intent integrity and runs gates. For CI.
-oakshelf-dev-hook setup         Plans the repository adapter files. Pass --write to apply.
+diego-dev-hook pre-commit    Fast deterministic checks. Currently a pass-through.
+diego-dev-hook post-commit   Marks description and review stale. Never blocks.
+diego-dev-hook pre-push      Verifies base relationship, intent lock, freshness, and gates.
+diego-dev-hook gates         Runs the configured gates only.
+diego-dev-hook pr-sync       Creates or updates the PR with managed sections and the size label. Description on stdin.
+diego-dev-hook ci-verify     Verifies PR intent integrity and runs gates. For CI.
+diego-dev-hook setup         Plans the repository adapter files. Pass --write to apply.
 ```
 
 Exit code 0 means pass. Exit code 1 means fail or error.

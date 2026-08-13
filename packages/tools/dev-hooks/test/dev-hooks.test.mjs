@@ -177,7 +177,7 @@ test("setup plans without writing and applies with write", () => {
     assert.equal(applied.applied, true);
     assert.equal(
       readFileSync(join(dir, ".husky", "pre-push"), "utf8"),
-      "pnpm exec oakshelf-dev-hook pre-push\n",
+      "pnpm exec diego-dev-hook pre-push\n",
     );
     assert.ok(existsSync(join(dir, ".oakshelf", "development.json")));
 
