@@ -1,8 +1,8 @@
 {
   "name": "@diego/development",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "private": true,
-  "description": "Diego's software-development workflow.",
+  "description": "Deliver a software change with a locked intent, an intent-based review, and deterministic repository gates.",
   "license": "MIT",
   "author": "Diego Landa",
   "repository": {
@@ -17,6 +17,7 @@
   "files": [
     "oakshelf.json",
     "WORKFLOW.md",
+    "SKILL.md",
     "README.md",
     "LICENSE",
     "PRD.md",

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/git-repository",
+  "version": "0.0.1",
+  "kind": "tool",
+  "description": "Deterministic Git state inspection and an explicit, guarded rebase for the development workflow.",
+  "entrypoints": {
+    "tool": "./TOOL.md"
+  },
+  "files": [
+    "TOOL.md",
+    "README.md",
+    "LICENSE",
+    "index.mjs"
+  ],
+  "dependencies": {}
+}

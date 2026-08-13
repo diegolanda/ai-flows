@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/pipeline-ui",
+  "version": "0.0.1",
+  "kind": "tool",
+  "description": "Terminal renderer for delivery pipeline events with a plain fallback for non-TTY output.",
+  "entrypoints": {
+    "tool": "./TOOL.md"
+  },
+  "files": [
+    "TOOL.md",
+    "README.md",
+    "LICENSE",
+    "index.mjs"
+  ],
+  "dependencies": {}
+}

@@ -1,14 +1,16 @@
 {
   "schemaVersion": 1,
   "name": "@diego/development",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "kind": "workflow",
-  "description": "A scaffold for a software-development workflow that uses simple technical writing for final artifacts.",
+  "description": "Deliver a software change with a locked intent, an intent-based review, and deterministic repository gates.",
   "entrypoints": {
-    "workflow": "./WORKFLOW.md"
+    "workflow": "./WORKFLOW.md",
+    "skill": "./SKILL.md"
   },
   "files": [
     "WORKFLOW.md",
+    "SKILL.md",
     "README.md",
     "LICENSE",
     "PRD.md",
@@ -24,6 +26,12 @@
     "@diego/simple-technical-writing": "^0.0.3",
     "@diego/development-intent": "^0.0.1",
     "@diego/pr-description": "^0.0.1",
-    "@diego/intent-review": "^0.0.1"
+    "@diego/intent-review": "^0.0.1",
+    "@diego/git-repository": "^0.0.1",
+    "@diego/branch-state": "^0.0.1",
+    "@diego/github-cli": "^0.0.1",
+    "@diego/quality-gates": "^0.0.1",
+    "@diego/pipeline-ui": "^0.0.1",
+    "@diego/dev-hooks": "^0.0.1"
   }
 }

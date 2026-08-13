@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install OakShelf beta2
-        run: npm install --global @oakshelf/cli@beta2
+      - name: Install OakShelf
+        run: npm install --global @oakshelf/cli@beta3
 
       - name: Run repository checks
         run: pnpm check
