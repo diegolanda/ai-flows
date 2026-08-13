@@ -8,7 +8,7 @@ description: |
   playbook lives in WORKFLOW.md next to this file.
 license: MIT
 metadata:
-  version: "0.0.6"
+  version: "0.0.7"
   workflow: "@diego/development"
 ---
 
@@ -27,7 +27,7 @@ Read `WORKFLOW.md` in this directory and follow the action that matches the user
 
 Non-negotiable rules, restated from the playbook:
 
-1. Never edit workflow state files directly. All state changes go through the `diego-branch-state` CLI. When `pnpm exec diego-branch-state` does not resolve, run it from the OakShelf store: `oak inspect '@diego/branch-state'` reports the installed path, and `node <path>/bin.mjs` is the command. Never block intent capture on a missing package manager install.
+1. Never edit workflow state files directly. All state changes go through the `diego-branch-state` CLI. Run it directly from the OakShelf store: `oak inspect '@diego/branch-state'` reports the installed path, and `node <path>/bin.mjs` is the command. A package manager install is an optional convenience, never a requirement. Never block intent capture on one.
 2. The locked intent is immutable outside the `intent edit` action.
 3. Deterministic scripts decide pass or fail. Never reinterpret a failure as a pass.
 4. Fail closed. If a required stage cannot run, stop and report why.

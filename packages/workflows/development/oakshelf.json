@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "@diego/development",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "kind": "workflow",
   "description": "Deliver a software change with a locked intent, an intent-based review, and deterministic repository gates.",
   "entrypoints": {

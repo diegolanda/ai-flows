@@ -10,11 +10,8 @@ You are the workflow engine. `oak sync` installed this file, the skills, and the
 
 ## Ground rules
 
-1. Never edit workflow state files directly. All state changes go through the `diego-branch-state` CLI. Resolve tool commands in this order:
-   1. `pnpm exec <command>`, when the repository installs the tool packages through a package manager.
-   2. The OakShelf store: run `oak inspect '@diego/branch-state'` to get the installed path, then run `node <path>/bin.mjs <args>`. The `branch-state` tool has no dependencies and runs from the store.
-   3. Inside the `ai-flows` monorepo: `node packages/tools/branch-state/bin.mjs`.
-   The `diego-dev-hook` runner currently resolves only through a package manager install, because it imports its sibling tools. When it is unavailable, report that gates and PR sync are unavailable and continue with the stages that work. Never block intent capture on it.
+1. Never edit workflow state files directly. All state changes go through the `diego-branch-state` CLI. Execute it directly from the OakShelf store: run `oak inspect '@diego/branch-state'` once to get the installed path, then run `node <path>/bin.mjs <args>` for every state command. The tool has no dependencies and Node is the only requirement. Only when the store is unavailable, fall back to `pnpm exec diego-branch-state` (a repository that installs the tool packages) or `node packages/tools/branch-state/bin.mjs` (the `ai-flows` monorepo).
+   The `diego-dev-hook` runner is the exception: it cannot run from the store yet because it imports its sibling tools, so it resolves only through a package manager install (`pnpm exec diego-dev-hook`). When it is unavailable, report that gates and PR sync are unavailable and continue with the stages that work. Never block intent capture on it.
 2. The locked intent is immutable. Only the `intent edit` action can change it, and only with the developer's explicit approval and a stated reason.
 3. AI output is a proposal. Deterministic scripts decide pass or fail. If a script exits non-zero, the stage failed. Do not reinterpret a failure as a pass.
 4. Fail closed. If a required stage cannot run, stop and report why. Do not continue to later stages.
