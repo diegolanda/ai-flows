@@ -14,7 +14,7 @@ An OakShelf workflow that delivers a software change with a locked intent, an in
 
 ## CI parity
 
-`ci/github-intent-check.example.yml` shows how a target repository runs the deterministic subset of the workflow in GitHub Actions: intent hash integrity plus the configured gates through `oakshelf-dev-hook ci-verify`.
+`ci/github-intent-check.example.yml` shows how a target repository runs the deterministic subset of the workflow in GitHub Actions: intent hash integrity plus the configured gates through `diego-dev-hook ci-verify`.
 
 ## Validate and pack
 

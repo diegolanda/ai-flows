@@ -41,5 +41,9 @@
     "pack:skill:npm": "pnpm --filter @diego/simple-technical-writing pack",
     "pack:profile:npm": "pnpm --filter @diego/development-profile pack",
     "pack:workflow:npm": "pnpm --filter @diego/development pack"
+  },
+  "devDependencies": {
+    "@diego/branch-state": "workspace:^",
+    "@diego/dev-hooks": "workspace:^"
   }
 }

@@ -13,7 +13,7 @@ node <installed-path>/bin.mjs setup            # dry-run plan
 node <installed-path>/bin.mjs setup --write    # apply after approval
 ```
 
-In a pnpm workspace the bin is also available as `pnpm exec oakshelf-dev-hook`.
+In a pnpm workspace the bin is also available as `pnpm exec diego-dev-hook`.
 
 ## Notes for agents
 

@@ -713,10 +713,10 @@ Example:
 Example hook:
 
 ```sh
-pnpm exec oakshelf-dev-hook pre-push
+pnpm exec diego-dev-hook pre-push
 ```
 
-`oakshelf-dev-hook` is a deterministic hook runner provided by the tool packages. Its final name is decided in Phase 2. It contains no AI logic. The exact resolution mechanism depends on how `oak sync` places tool packages in a target repository. No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
+`diego-dev-hook` is a deterministic hook runner provided by the tool packages. Its final name is decided in Phase 2. It contains no AI logic. The exact resolution mechanism depends on how `oak sync` places tool packages in a target repository. No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
 
 ## 14. Configuration
 

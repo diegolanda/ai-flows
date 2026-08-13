@@ -1,6 +1,6 @@
 {
   "name": "@diego/branch-state",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -9,7 +9,7 @@
     ".": "./index.mjs"
   },
   "bin": {
-    "oakshelf-branch-state": "./bin.mjs"
+    "diego-branch-state": "./bin.mjs"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"

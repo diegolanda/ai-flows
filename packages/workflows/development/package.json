@@ -1,6 +1,6 @@
 {
   "name": "@diego/development",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "private": true,
   "description": "Deliver a software change with a locked intent, an intent-based review, and deterministic repository gates.",
   "license": "MIT",

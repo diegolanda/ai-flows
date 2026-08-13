@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "@diego/development",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "kind": "workflow",
   "description": "Deliver a software change with a locked intent, an intent-based review, and deterministic repository gates.",
   "entrypoints": {
@@ -28,10 +28,10 @@
     "@diego/pr-description": "^0.0.1",
     "@diego/intent-review": "^0.0.1",
     "@diego/git-repository": "^0.0.1",
-    "@diego/branch-state": "^0.0.1",
+    "@diego/branch-state": "^0.0.2",
     "@diego/github-cli": "^0.0.1",
     "@diego/quality-gates": "^0.0.1",
     "@diego/pipeline-ui": "^0.0.1",
-    "@diego/dev-hooks": "^0.0.1"
+    "@diego/dev-hooks": "^0.0.2"
   }
 }

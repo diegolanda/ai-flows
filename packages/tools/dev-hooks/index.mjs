@@ -351,7 +351,7 @@ export async function ciVerify({ cwd, prNumber, emit = noop, body } = {}) {
 const HOOK_NAMES = ["pre-commit", "post-commit", "pre-push"];
 
 function hookContent(name) {
-  return `pnpm exec oakshelf-dev-hook ${name}\n`;
+  return `pnpm exec diego-dev-hook ${name}\n`;
 }
 
 const STARTER_CONFIG = `${JSON.stringify(

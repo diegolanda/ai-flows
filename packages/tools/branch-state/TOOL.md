@@ -13,7 +13,7 @@ node <installed-path>/bin.mjs record-review --head <sha> --status pass
 node <installed-path>/bin.mjs check-freshness
 ```
 
-In a pnpm workspace the bin is also available as `pnpm exec oakshelf-branch-state`.
+In a pnpm workspace the bin is also available as `pnpm exec diego-branch-state`.
 
 ## Notes for agents
 

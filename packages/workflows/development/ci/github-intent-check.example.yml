@@ -11,7 +11,7 @@
 # question in the PRD (section 24).
 #
 # Copy this file to .github/workflows/intent-check.yml in a repository set up
-# with the @diego/development workflow, where `pnpm exec oakshelf-dev-hook`
+# with the @diego/development workflow, where `pnpm exec diego-dev-hook`
 # resolves. Mark the check as required in branch protection so GitHub stays
 # the authoritative enforcement layer.
 
@@ -43,4 +43,4 @@ jobs:
       - name: Verify intent integrity and run gates
         env:
           GH_TOKEN: ${{ github.token }}
-        run: pnpm exec oakshelf-dev-hook ci-verify --pr ${{ github.event.pull_request.number }}
+        run: pnpm exec diego-dev-hook ci-verify --pr ${{ github.event.pull_request.number }}
