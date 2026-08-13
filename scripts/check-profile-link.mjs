@@ -38,6 +38,11 @@ try {
     "--yes",
   ], baseEnvironment);
 
+  // beta3 requires every projected package to be approved at its installed
+  // digest before the first link.
+  oak(["approve", "@diego/simple-technical-writing", "--global"], baseEnvironment);
+  oak(["approve", profile, "--global"], baseEnvironment);
+
   const claudeDirectory = join(home, ".claude");
   const claudeTarget = join(claudeDirectory, "CLAUDE.md");
   const claudeBackup = join(claudeDirectory, "CLAUDE.back.md");
