@@ -10,9 +10,20 @@
   "files": [
     "WORKFLOW.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "PRD.md",
+    "contracts/CONTRACTS.md",
+    "contracts/intent.schema.json",
+    "contracts/description.schema.json",
+    "contracts/review.schema.json",
+    "contracts/repository-config.schema.json",
+    "contracts/branch-state.schema.json",
+    "ci/github-intent-check.example.yml"
   ],
   "dependencies": {
-    "@diego/simple-technical-writing": "^0.0.2"
+    "@diego/simple-technical-writing": "^0.0.3",
+    "@diego/development-intent": "^0.0.1",
+    "@diego/pr-description": "^0.0.1",
+    "@diego/intent-review": "^0.0.1"
   }
 }

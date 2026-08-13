@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/pr-description",
+  "version": "0.0.1",
+  "kind": "skill",
+  "description": "Describe the current implementation for a PR body. The output schema has no intent field by design.",
+  "entrypoints": {
+    "skill": "./SKILL.md"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@diego/simple-technical-writing": "^0.0.3"
+  }
+}

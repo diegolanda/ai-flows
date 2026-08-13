@@ -18,10 +18,16 @@
     "oakshelf.json",
     "WORKFLOW.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "PRD.md",
+    "contracts",
+    "ci"
   ],
   "dependencies": {
-    "@diego/simple-technical-writing": "workspace:^"
+    "@diego/simple-technical-writing": "workspace:^",
+    "@diego/development-intent": "workspace:^",
+    "@diego/pr-description": "workspace:^",
+    "@diego/intent-review": "workspace:^"
   },
   "oakshelf": {
     "kind": "workflow",

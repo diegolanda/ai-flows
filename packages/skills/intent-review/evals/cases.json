@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "undisclosed-scope-fails",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization. Do not change authorization behavior.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return adminFallback();",
+        "failOn": ["high", "critical"]
+      },
+      "expect": {
+        "semantic": [
+          "status is fail",
+          "a finding relates the authorization change to the non-goal"
+        ]
+      }
+    },
+    {
+      "name": "matching-implementation-passes",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null;\ndiff --git a/test/user.test.ts b/test/user.test.ts\n+  it('returns null when organization is missing', ...)",
+        "failOn": ["high", "critical"]
+      },
+      "expect": {
+        "semantic": ["status is pass"]
+      }
+    },
+    {
+      "name": "consequence-before-cause",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization. Do not change authorization behavior.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return adminFallback();",
+        "failOn": ["high", "critical"]
+      },
+      "expect": {
+        "semantic": [
+          "the finding message states the user-visible consequence before the internal cause"
+        ]
+      }
+    },
+    {
+      "name": "below-threshold-findings-still-reported",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null; // TODO: log",
+        "failOn": ["critical"]
+      },
+      "expect": {
+        "semantic": [
+          "status is pass when no finding reaches the failOn severities",
+          "lower-severity findings still appear in findings"
+        ]
+      }
+    },
+    {
+      "name": "structured-output-only",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null;",
+        "failOn": ["high", "critical"]
+      },
+      "expect": {
+        "jsonOnly": true,
+        "requiredFields": ["status", "findings"],
+        "excludesFields": ["intent", "description"]
+      }
+    }
+  ]
+}

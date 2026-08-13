@@ -1,0 +1,41 @@
+{
+  "name": "@diego/intent-review",
+  "version": "0.0.1",
+  "description": "An OakShelf skill that reviews a complete branch diff against a locked intent.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegolanda/ai-flows.git",
+    "directory": "packages/skills/intent-review"
+  },
+  "homepage": "https://github.com/diegolanda/ai-flows/tree/main/packages/skills/intent-review#readme",
+  "bugs": {
+    "url": "https://github.com/diegolanda/ai-flows/issues"
+  },
+  "keywords": [
+    "oakshelf",
+    "skill",
+    "review",
+    "intent",
+    "ai"
+  ],
+  "files": [
+    "oakshelf.json",
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "evals"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "oakshelf": {
+    "kind": "skill",
+    "manifest": "./oakshelf.json"
+  },
+  "scripts": {
+    "check": "node ../../../scripts/check-package.mjs . skill",
+    "pack:dry": "npm pack --dry-run"
+  }
+}

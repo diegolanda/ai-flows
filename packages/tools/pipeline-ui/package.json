@@ -1,0 +1,15 @@
+{
+  "name": "@diego/pipeline-ui",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Terminal renderer for delivery pipeline events. Consumes workflow events and owns no orchestration logic.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

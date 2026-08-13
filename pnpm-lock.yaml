@@ -14,10 +14,61 @@ importers:
         specifier: workspace:~
         version: link:../../skills/simple-technical-writing
 
+  packages/skills/development-intent:
+    dependencies:
+      '@diego/simple-technical-writing':
+        specifier: workspace:^
+        version: link:../simple-technical-writing
+
+  packages/skills/intent-review: {}
+
+  packages/skills/pr-description:
+    dependencies:
+      '@diego/simple-technical-writing':
+        specifier: workspace:^
+        version: link:../simple-technical-writing
+
   packages/skills/simple-technical-writing: {}
+
+  packages/tools/branch-state: {}
+
+  packages/tools/dev-hooks:
+    dependencies:
+      '@diego/branch-state':
+        specifier: workspace:^
+        version: link:../branch-state
+      '@diego/git-repository':
+        specifier: workspace:^
+        version: link:../git-repository
+      '@diego/github-cli':
+        specifier: workspace:^
+        version: link:../github-cli
+      '@diego/pipeline-ui':
+        specifier: workspace:^
+        version: link:../pipeline-ui
+      '@diego/quality-gates':
+        specifier: workspace:^
+        version: link:../quality-gates
+
+  packages/tools/git-repository: {}
+
+  packages/tools/github-cli: {}
+
+  packages/tools/pipeline-ui: {}
+
+  packages/tools/quality-gates: {}
 
   packages/workflows/development:
     dependencies:
+      '@diego/development-intent':
+        specifier: workspace:^
+        version: link:../../skills/development-intent
+      '@diego/intent-review':
+        specifier: workspace:^
+        version: link:../../skills/intent-review
+      '@diego/pr-description':
+        specifier: workspace:^
+        version: link:../../skills/pr-description
       '@diego/simple-technical-writing':
         specifier: workspace:^
         version: link:../../skills/simple-technical-writing

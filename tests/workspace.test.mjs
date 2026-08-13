@@ -72,7 +72,7 @@ test("workflow consumes the skill", async () => {
   assert.equal(manifest.entrypoints.workflow, "./WORKFLOW.md");
   assert.equal(
     manifest.dependencies["@diego/simple-technical-writing"],
-    "^0.0.2",
+    "^0.0.3",
   );
 
   const workflow = await read("packages/workflows/development/WORKFLOW.md");

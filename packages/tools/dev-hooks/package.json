@@ -1,0 +1,25 @@
+{
+  "name": "@diego/dev-hooks",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Deterministic hook runner and delivery helpers for the @diego/development workflow. Contains no AI logic.",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "bin": {
+    "oakshelf-dev-hook": "./bin.mjs"
+  },
+  "dependencies": {
+    "@diego/branch-state": "workspace:^",
+    "@diego/git-repository": "workspace:^",
+    "@diego/github-cli": "workspace:^",
+    "@diego/pipeline-ui": "workspace:^",
+    "@diego/quality-gates": "workspace:^"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/repository-config.schema.json",
+  "title": "Repository configuration",
+  "description": "Contents of .oakshelf/development.json in a target repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workflow"],
+  "properties": {
+    "workflow": {
+      "type": "string",
+      "const": "@diego/development"
+    },
+    "baseBranch": {
+      "type": "string",
+      "default": "auto",
+      "description": "A branch name, or \"auto\" to detect main or master."
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "failOn": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "default": ["high", "critical"],
+          "description": "Finding severities that block delivery."
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "script"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name of the pipeline stage."
+          },
+          "script": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The package.json script to run. Only configured scripts run."
+          },
+          "required": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, a gate failure blocks delivery."
+          },
+          "skipIfMissing": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, a missing package script skips the gate. If false, a missing script is a failure."
+          }
+        }
+      }
+    }
+  }
+}

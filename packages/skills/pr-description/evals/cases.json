@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "no-intent-output",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null;",
+        "commits": ["Add nil guard for missing organization"]
+      },
+      "expect": {
+        "jsonOnly": true,
+        "requiredFields": ["description", "covered", "skipped", "assumptions", "deviations"],
+        "excludesFields": ["intent"]
+      }
+    },
+    {
+      "name": "describe-only-implemented-behavior",
+      "input": {
+        "intent": "Prevent nil errors and add tests for users without an organization.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null;",
+        "commits": ["Add nil guard"]
+      },
+      "expect": {
+        "semantic": [
+          "missing tests appear in skipped",
+          "description does not claim tests were added"
+        ]
+      }
+    },
+    {
+      "name": "deviations-are-visible",
+      "input": {
+        "intent": "Return an empty list when the organization is missing.",
+        "diff": "diff --git a/src/user.ts b/src/user.ts\n+  if (!user.organization) return null;",
+        "commits": ["Return null instead of empty list"]
+      },
+      "expect": {
+        "semantic": [
+          "returning null instead of an empty list appears in deviations"
+        ]
+      }
+    },
+    {
+      "name": "preserve-identifiers",
+      "input": {
+        "intent": "Prevent nil errors when resolving a user without an assigned organization.",
+        "diff": "diff --git a/src/resolveUser.ts b/src/resolveUser.ts\n+  if (!user.organizationId) return null;",
+        "commits": ["Guard resolveUser against missing organizationId"]
+      },
+      "expect": {
+        "exact": ["resolveUser", "organizationId"]
+      }
+    }
+  ]
+}

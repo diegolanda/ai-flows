@@ -1,0 +1,17 @@
+{
+  "name": "@diego/branch-state",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Diego Landa",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "bin": {
+    "oakshelf-branch-state": "./bin.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

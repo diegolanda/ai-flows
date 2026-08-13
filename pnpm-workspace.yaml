@@ -2,3 +2,4 @@ packages:
   - packages/skills/*
   - packages/profiles/*
   - packages/workflows/*
+  - packages/tools/*
