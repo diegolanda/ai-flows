@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/github-cli",
+  "version": "0.0.1",
+  "kind": "tool",
+  "description": "gh wrapper with managed PR body sections, size labels, and check status for the development workflow.",
+  "entrypoints": {
+    "tool": "./TOOL.md"
+  },
+  "files": [
+    "TOOL.md",
+    "README.md",
+    "LICENSE",
+    "index.mjs"
+  ],
+  "dependencies": {}
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "name": "@diego/quality-gates",
+  "version": "0.0.1",
+  "kind": "tool",
+  "description": "Run configured package scripts as delivery gates with required and skipIfMissing semantics.",
+  "entrypoints": {
+    "tool": "./TOOL.md"
+  },
+  "files": [
+    "TOOL.md",
+    "README.md",
+    "LICENSE",
+    "index.mjs"
+  ],
+  "dependencies": {}
+}
