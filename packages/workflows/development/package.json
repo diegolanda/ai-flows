@@ -1,6 +1,6 @@
 {
   "name": "@diego/development",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "Diego's software-development workflow.",
   "license": "MIT",
