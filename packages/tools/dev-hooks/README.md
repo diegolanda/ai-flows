@@ -12,9 +12,24 @@ diego-dev-hook gates         Runs the configured gates only.
 diego-dev-hook pr-sync       Creates or updates the PR with managed sections and the size label. Description on stdin.
 diego-dev-hook ci-verify     Verifies PR intent integrity and runs gates. For CI.
 diego-dev-hook setup         Plans the repository adapter files. Pass --write to apply.
+diego-development-tools resolve   Resolves both CLI paths from DIEGO_AI_FLOWS_ROOT.
 ```
 
 Exit code 0 means pass. Exit code 1 means fail or error.
+
+Every `diego-dev-hook` command accepts `--cwd <target-repository>`. The option selects the repository without changing the caller's working directory.
+
+## Cross-repository resolution
+
+Set `DIEGO_AI_FLOWS_ROOT` to a local ai-flows checkout. Then run the resolver from any target repository:
+
+```bash
+node "$DIEGO_AI_FLOWS_ROOT/packages/tools/dev-hooks/resolve.mjs" resolve
+```
+
+The JSON result contains absolute `branchState` and `devHook` executable paths. The resolver checks the checkout's root-linked binaries first. It checks the source entrypoints next.
+
+Use `--root <path>` to override the environment variable. If resolution fails, the JSON error lists each attempted path and tells the user how to configure the checkout.
 
 ## Rules
 

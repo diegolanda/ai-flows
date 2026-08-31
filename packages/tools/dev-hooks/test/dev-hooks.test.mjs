@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync, chmodSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   ciVerify,
   extractManagedIntent,
@@ -25,6 +26,9 @@ import {
   canonicalizeIntent,
 } from "@diego/branch-state";
 import { renderManagedBody } from "@diego/github-cli";
+
+const testDirectory = dirname(fileURLToPath(import.meta.url));
+const devHookBin = resolve(testDirectory, "../bin.mjs");
 
 function gitRun(cwd, ...args) {
   return execFileSync("git", args, { cwd, encoding: "utf8" });
@@ -412,5 +416,31 @@ test("a label failure does not fail prSync and the PR number is still recorded",
   } finally {
     stub.cleanup();
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("pr-sync CLI uses --cwd for target state and GitHub commands", () => {
+  const target = makeRepo();
+  const launcher = makeRepo();
+  const stub = makeGhStub();
+  try {
+    prepareLockedState(target, { size: "S" });
+    execFileSync(
+      process.execPath,
+      [devHookBin, "pr-sync", "--cwd", target, "--title", "Target PR"],
+      {
+        cwd: launcher,
+        env: { ...process.env, PATH: `${stub.dir}:${process.env.PATH}` },
+        input: "Target description.",
+        encoding: "utf8",
+      },
+    );
+    assert.equal(readState({ cwd: target }).pullRequest, 9);
+    assert.equal(readState({ cwd: launcher }), null);
+    assert.ok(stub.calls().some((call) => call.startsWith("pr create")));
+  } finally {
+    stub.cleanup();
+    rmSync(target, { recursive: true, force: true });
+    rmSync(launcher, { recursive: true, force: true });
   }
 });

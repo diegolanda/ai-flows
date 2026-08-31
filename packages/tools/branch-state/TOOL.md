@@ -13,6 +13,8 @@ node <installed-path>/bin.mjs record-review --head <sha> --status pass
 node <installed-path>/bin.mjs check-freshness
 ```
 
+Pass `--cwd <target-repository>` to each command when the executable is outside the target repository.
+
 In a pnpm workspace the bin is also available as `pnpm exec diego-branch-state`.
 
 ## Notes for agents

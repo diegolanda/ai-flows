@@ -25,10 +25,19 @@ function readStdin() {
 function parseFlags(args) {
   const flags = {};
   for (let i = 0; i < args.length; i += 1) {
-    if (args[i].startsWith("--")) {
-      flags[args[i].slice(2)] = args[i + 1];
-      i += 1;
+    const arg = args[i];
+    if (!arg.startsWith("--")) continue;
+    const key = arg.slice(2);
+    if (key === "write") {
+      flags[key] = true;
+      continue;
     }
+    const value = args[i + 1];
+    if (value === undefined || value.startsWith("--")) {
+      throw new Error(`Flag ${arg} requires a value.`);
+    }
+    flags[key] = value;
+    i += 1;
   }
   return flags;
 }
@@ -42,6 +51,7 @@ function reportFailures(failures) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   const flags = parseFlags(rest);
+  const cwd = flags.cwd;
   const renderer = createRenderer({});
   const emit = renderer.handle;
 
@@ -49,30 +59,30 @@ async function main() {
     case "pre-commit":
       return preCommit().status === "pass" ? 0 : 1;
     case "post-commit":
-      return postCommit({}).status === "pass" ? 0 : 1;
+      return postCommit({ cwd }).status === "pass" ? 0 : 1;
     case "pre-push": {
-      const result = await prePush({ emit });
+      const result = await prePush({ cwd, emit });
       reportFailures(result.failures);
       return result.status === "pass" ? 0 : 1;
     }
     case "gates": {
-      const result = await gatesOnly({ emit });
+      const result = await gatesOnly({ cwd, emit });
       return result.status === "pass" ? 0 : 1;
     }
     case "pr-sync": {
       const description = await readStdin();
-      const result = prSync({ title: flags.title, description });
+      const result = prSync({ cwd, title: flags.title, description });
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;
     }
     case "ci-verify": {
       const prNumber = flags.pr ? Number(flags.pr) : undefined;
-      const result = await ciVerify({ prNumber, emit });
+      const result = await ciVerify({ cwd, prNumber, emit });
       reportFailures(result.failures);
       return result.status === "pass" ? 0 : 1;
     }
     case "setup": {
-      const result = setup({ write: "write" in flags });
+      const result = setup({ cwd, write: "write" in flags });
       for (const entry of result.entries) {
         process.stdout.write(`${entry.action.padEnd(6)} ${entry.path}\n`);
       }
