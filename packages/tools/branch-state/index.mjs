@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { currentBranch, headSha } from './lib/git.mjs';
 import { canonicalizeIntent, intentHash } from './lib/intent.mjs';
-import { statePath } from './lib/paths.mjs';
+import { legacyStatePaths, statePath } from './lib/paths.mjs';
 import { validateState } from './lib/validate.mjs';
 
 export { canonicalizeIntent, intentHash };
@@ -38,8 +38,35 @@ function writeStateFile(file, state) {
   fs.writeFileSync(file, `${JSON.stringify(state, null, 2)}\n`);
 }
 
-function loadExistingState(cwd, branch, file) {
-  const state = readStateFile(file);
+function findExistingState(cwd, branch) {
+  const canonicalFile = fileFor(cwd, branch);
+  const canonicalState = readStateFile(canonicalFile);
+  if (canonicalState !== null) {
+    if (canonicalState.branch !== branch) {
+      throw new Error(`Branch state at "${canonicalFile}" belongs to branch "${canonicalState.branch}".`);
+    }
+    return canonicalState;
+  }
+
+  const legacyMatches = [];
+  for (const file of new Set(legacyStatePaths(cwd, branch))) {
+    if (file === canonicalFile) continue;
+    const state = readStateFile(file);
+    if (state?.branch === branch) {
+      legacyMatches.push({ file, state });
+    }
+  }
+
+  if (legacyMatches.length === 0) return null;
+  const expected = JSON.stringify(legacyMatches[0].state);
+  if (legacyMatches.some(({ state }) => JSON.stringify(state) !== expected)) {
+    throw new Error(`Conflicting legacy branch state found for branch "${branch}".`);
+  }
+  return legacyMatches[0].state;
+}
+
+function loadExistingState(cwd, branch) {
+  const state = findExistingState(cwd, branch);
   if (state === null) {
     throw new Error(`Branch state not found for branch "${branch}". Run init first.`);
   }
@@ -55,8 +82,7 @@ function loadExistingState(cwd, branch, file) {
 export function readState(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
-  const file = fileFor(cwd, branch);
-  return readStateFile(file);
+  return findExistingState(cwd, branch);
 }
 
 /**
@@ -78,7 +104,7 @@ export function initState(options = {}) {
   }
 
   const file = fileFor(cwd, branch);
-  if (fs.existsSync(file)) {
+  if (findExistingState(cwd, branch) !== null) {
     throw new Error(`Branch state already exists for branch "${branch}"`);
   }
 
@@ -108,7 +134,7 @@ export function setIntent(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   if (state.intentLocked) {
     throw new Error('Cannot set intent: intent is locked. Use editIntent instead.');
@@ -136,7 +162,7 @@ export function lockIntent(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   if (state.intentLocked) {
     throw new Error('Intent is already locked');
@@ -165,7 +191,7 @@ export function editIntent(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   if (!state.intentLocked) {
     throw new Error('Cannot edit intent: intent is not locked. Use setIntent instead.');
@@ -201,7 +227,7 @@ export function markStale(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   state.descriptionStale = true;
   state.reviewStale = true;
@@ -220,7 +246,7 @@ export function recordDescription(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   state.descriptionStale = false;
 
@@ -239,7 +265,7 @@ export function recordReview(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   if (typeof options.headSha !== 'string' || !COMMIT_SHA_PATTERN.test(options.headSha)) {
     throw new Error('headSha must be a 40-character lowercase hex commit SHA');
@@ -267,8 +293,7 @@ export function recordReview(options = {}) {
 export function checkFreshness(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
-  const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   const head = headSha(cwd);
   const reviewFreshForHead = state.lastReviewedHead === head;
@@ -292,7 +317,7 @@ export function setPullRequest(options = {}) {
   const cwd = resolveCwd(options.cwd);
   const branch = resolveBranch(cwd, options.branch);
   const file = fileFor(cwd, branch);
-  const state = loadExistingState(cwd, branch, file);
+  const state = loadExistingState(cwd, branch);
 
   if (!Number.isInteger(options.number) || options.number < 1) {
     throw new Error('number must be an integer greater than or equal to 1');
