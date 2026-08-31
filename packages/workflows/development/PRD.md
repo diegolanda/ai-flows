@@ -451,6 +451,7 @@ The state script is the only writer of workflow state. The agent calls it and ne
 Responsibilities:
 
 - read and write the branch state file described in section 10;
+- accept an explicit target repository through `--cwd`;
 - resolve the state directory through `git rev-parse --git-dir` so linked worktrees work;
 - record raw intent;
 - lock intent: canonicalize, hash, store the approval timestamp;
@@ -716,7 +717,11 @@ Example hook:
 pnpm exec diego-dev-hook pre-push
 ```
 
-`diego-dev-hook` is a deterministic hook runner provided by the tool packages. Its final name is decided in Phase 2. It contains no AI logic. The exact resolution mechanism depends on how `oak sync` places tool packages in a target repository. No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
+`diego-dev-hook` is a deterministic hook runner provided by the tool packages. It contains no AI logic. Each command accepts `--cwd <target-repository>` so the executable can run from another repository.
+
+For cross-repository use, `DIEGO_AI_FLOWS_ROOT` identifies a local ai-flows checkout. The `diego-development-tools resolve` command returns absolute paths for `diego-branch-state` and `diego-dev-hook`. Resolution does not change the caller's working directory. A failure lists every attempted path and tells the developer how to configure the checkout.
+
+No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
 
 ## 14. Configuration
 
@@ -926,6 +931,7 @@ Test strategy:
 - `git-repository` and `branch-state`: `node --test` against temporary Git repositories, including a linked worktree case;
 - `github-cli`: a stubbed `gh` executable on `PATH`;
 - `quality-gates`: fixture packages with passing, failing, and missing scripts.
+- cross-repository resolution: a target repository and an ai-flows checkout in separate directory trees.
 
 ### Phase 3 — Workflow orchestration
 

@@ -1,6 +1,6 @@
 {
   "name": "@diego/dev-hooks",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "description": "Deterministic hook runner and delivery helpers for the @diego/development workflow. Contains no AI logic.",
   "license": "MIT",
@@ -10,7 +10,8 @@
     ".": "./index.mjs"
   },
   "bin": {
-    "diego-dev-hook": "./bin.mjs"
+    "diego-dev-hook": "./bin.mjs",
+    "diego-development-tools": "./resolve.mjs"
   },
   "dependencies": {
     "@diego/branch-state": "workspace:^",
