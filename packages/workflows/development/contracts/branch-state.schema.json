@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/diegolanda/ai-flows/packages/workflows/development/contracts/branch-state.schema.json",
   "title": "Branch state",
-  "description": "Branch-specific workflow state stored at <git-dir>/oakshelf/development/<branch-safe-id>.json. Only the branch-state tool writes this file.",
+  "description": "Branch-specific workflow state stored at <git-common-dir>/oakshelf/development/<encoded-branch>.json. Only the branch-state tool writes this file.",
   "type": "object",
   "additionalProperties": false,
   "required": [

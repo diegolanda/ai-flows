@@ -41,8 +41,9 @@ The hash is workflow metadata, not a security boundary. It detects accidental or
 ## Branch state rules
 
 - Only the `branch-state` tool writes the state file. Agents must not edit it directly.
-- The state directory is `<git-dir>/oakshelf/development/`, where `<git-dir>` is the result of `git rev-parse --git-dir`.
-- The file name is a branch-safe identifier: replace every character outside `[A-Za-z0-9._-]` in the branch name with `-`.
+- The state directory is `<git-common-dir>/oakshelf/development/`, where `<git-common-dir>` is the absolute result of `git rev-parse --git-common-dir`.
+- The file name is the percent-encoded branch name, which prevents collisions between different branch names.
+- Legacy state remains readable from the main Git directory and linked-worktree Git directories.
 - Every write is validated against `branch-state.schema.json`.
 - When HEAD no longer equals `lastReviewedHead`, the review is stale.
 - A review result is valid only for the exact commit it reviewed.

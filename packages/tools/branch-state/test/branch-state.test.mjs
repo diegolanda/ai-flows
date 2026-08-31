@@ -20,7 +20,7 @@ import {
   intentHash,
 } from '../index.mjs';
 import { validateState } from '../lib/validate.mjs';
-import { branchSafeId } from '../lib/paths.mjs';
+import { branchSafeId, statePath } from '../lib/paths.mjs';
 
 function sh(cwd, args) {
   execFileSync('git', args, { cwd, encoding: 'utf8' });
@@ -74,16 +74,19 @@ test('readState returns null when no state file exists', () => {
   assert.equal(state, null);
 });
 
-test('branch-safe id sanitizes branch names with slashes', () => {
-  assert.equal(branchSafeId('fix/nil-check'), 'fix-nil-check');
+test('branch-safe id encodes branch names without collisions', () => {
+  assert.equal(branchSafeId('fix/nil-check'), 'fix%2Fnil-check');
+  assert.notEqual(branchSafeId('fix/nil-check'), branchSafeId('fix-nil-check'));
 
   const repo = makeRepo();
   sh(repo, ['checkout', '-b', 'fix/nil-check']);
   initState({ cwd: repo, branch: 'fix/nil-check', baseBranch: 'main', rawIntent: 'Fix nil check' });
 
-  const gitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], { cwd: repo, encoding: 'utf8' }).trim();
-  const expectedFile = path.join(gitDir, 'oakshelf', 'development', 'fix-nil-check.json');
-  assert.ok(fs.existsSync(expectedFile));
+  assert.ok(fs.existsSync(statePath(repo, 'fix/nil-check')));
+
+  initState({ cwd: repo, branch: 'fix-nil-check', baseBranch: 'main', rawIntent: 'Different intent' });
+  assert.equal(readState({ cwd: repo, branch: 'fix/nil-check' }).rawIntent, 'Fix nil check');
+  assert.equal(readState({ cwd: repo, branch: 'fix-nil-check' }).rawIntent, 'Different intent');
 });
 
 test('lock flow: setIntent then lockIntent produces the expected hash', () => {
@@ -224,7 +227,7 @@ test('validation rejects a state missing required fields', () => {
   assert.throws(() => validateState({ version: 1 }), /missing required field/);
 });
 
-test('worktree case: state for a linked worktree lands in that worktree git dir', () => {
+test('worktree case: state is shared through the common Git directory', () => {
   const repo = makeRepo();
   const worktreeParent = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-state-worktree-'));
   const worktreePath = path.join(worktreeParent, 'wt');
@@ -238,19 +241,32 @@ test('worktree case: state for a linked worktree lands in that worktree git dir'
   });
   assert.equal(state.branch, 'feature/worktree-branch');
 
+  assert.ok(fs.existsSync(statePath(worktreePath, 'feature/worktree-branch')));
+  assert.deepEqual(readState({ cwd: repo, branch: 'feature/worktree-branch' }), state);
+});
+
+test('legacy worktree state remains readable and migrates on the next write', () => {
+  const repo = makeRepo();
+  const worktreeParent = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-state-worktree-'));
+  const worktreePath = path.join(worktreeParent, 'wt');
+  const branch = 'feature/legacy-worktree';
+  sh(repo, ['worktree', 'add', '-b', branch, worktreePath]);
+
+  const state = initState({ cwd: worktreePath, branch, baseBranch: 'main', rawIntent: 'Legacy intent' });
+  const canonicalFile = statePath(worktreePath, branch);
   const worktreeGitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], {
     cwd: worktreePath,
     encoding: 'utf8',
   }).trim();
-  const mainGitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], { cwd: repo, encoding: 'utf8' }).trim();
+  const legacyFile = path.join(worktreeGitDir, 'oakshelf', 'development', 'feature-legacy-worktree.json');
+  fs.mkdirSync(path.dirname(legacyFile), { recursive: true });
+  fs.renameSync(canonicalFile, legacyFile);
 
-  assert.notEqual(worktreeGitDir, mainGitDir);
-
-  const expectedFile = path.join(worktreeGitDir, 'oakshelf', 'development', 'feature-worktree-branch.json');
-  assert.ok(fs.existsSync(expectedFile));
-
-  const mainStateAttempt = readState({ cwd: repo, branch: 'feature/worktree-branch' });
-  assert.equal(mainStateAttempt, null);
+  assert.deepEqual(readState({ cwd: repo, branch }), state);
+  const updated = setIntent({ cwd: repo, branch, intent: 'Keep the legacy intent.' });
+  assert.equal(updated.intent, 'Keep the legacy intent.');
+  assert.ok(fs.existsSync(canonicalFile));
+  assert.ok(fs.existsSync(legacyFile));
 });
 
 test('setIntent stores a size and editIntent updates it', () => {

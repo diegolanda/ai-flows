@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import path from 'node:path';
 
 /**
  * Run a git command in the given working directory and return trimmed stdout.
@@ -24,6 +25,17 @@ function runGit(args, cwd) {
  */
 export function gitDir(cwd) {
   return runGit(['rev-parse', '--absolute-git-dir'], cwd);
+}
+
+/**
+ * Resolve the shared Git directory for the repository at `cwd`.
+ * Linked worktrees return the same directory as the main worktree.
+ *
+ * @param {string} cwd
+ * @returns {string}
+ */
+export function gitCommonDir(cwd) {
+  return path.resolve(cwd, runGit(['rev-parse', '--git-common-dir'], cwd));
 }
 
 /**

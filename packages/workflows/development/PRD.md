@@ -452,7 +452,7 @@ Responsibilities:
 
 - read and write the branch state file described in section 10;
 - accept an explicit target repository through `--cwd`;
-- resolve the state directory through `git rev-parse --git-dir` so linked worktrees work;
+- resolve the state directory through `git rev-parse --git-common-dir` so linked worktrees share branch state;
 - record raw intent;
 - lock intent: canonicalize, hash, store the approval timestamp;
 - mark description and review stale;
@@ -572,10 +572,14 @@ Task state should be local and branch-specific.
 Recommended initial storage:
 
 ```text
-<git-dir>/oakshelf/development/<branch-safe-id>.json
+<git-common-dir>/oakshelf/development/<encoded-branch>.json
 ```
 
-`<git-dir>` is the result of `git rev-parse --git-dir`. Do not assume that `.git` is a directory, because in a linked worktree `.git` is a file.
+`<git-common-dir>` is the absolute result of `git rev-parse --git-common-dir`. Linked worktrees use the same directory.
+
+`<encoded-branch>` is the percent-encoded branch name. This encoding prevents collisions between names such as `fix/a-b` and `fix-a-b`.
+
+The tool reads legacy state from the previous main-worktree and linked-worktree locations. A later write creates the shared state file without deleting legacy files.
 
 This state must not be committed by default.
 

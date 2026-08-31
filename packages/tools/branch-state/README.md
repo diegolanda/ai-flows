@@ -9,12 +9,14 @@ This tool is the only writer of the branch state file. Agents and skills must no
 The state directory is:
 
 ```text
-<git-dir>/oakshelf/development/<branch-safe-id>.json
+<git-common-dir>/oakshelf/development/<encoded-branch>.json
 ```
 
-`<git-dir>` is the result of `git rev-parse --absolute-git-dir`, run from the repository at `cwd`. This resolution works for linked worktrees, where `.git` is a file rather than a directory.
+`<git-common-dir>` is the absolute result of `git rev-parse --git-common-dir`. The shared directory lets every linked worktree read the same branch state.
 
-`<branch-safe-id>` replaces every character outside `[A-Za-z0-9._-]` in the branch name with `-`. For example, branch `fix/nil-check` maps to file `fix-nil-check.json`.
+`<encoded-branch>` uses percent encoding so different branch names cannot map to the same file. For example, branch `fix/nil-check` maps to `fix%2Fnil-check.json`.
+
+The tool can read legacy files from the main Git directory and linked-worktree Git directories. The next state write creates the shared file and leaves the legacy file intact.
 
 The state file is local. Do not commit it.
 

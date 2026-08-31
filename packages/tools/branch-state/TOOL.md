@@ -1,6 +1,6 @@
 # branch-state
 
-The only writer of branch-specific workflow state for `@diego/development`: raw intent, normalized intent, deterministic lock and hash, size, staleness, review results, and the PR number. Every write is validated against the branch state schema. State lives under `<git-dir>/oakshelf/development/`.
+The only writer of branch-specific workflow state for `@diego/development`: raw intent, normalized intent, deterministic lock and hash, size, staleness, review results, and the PR number. Every write is validated against the branch state schema. State lives under `<git-common-dir>/oakshelf/development/` so linked worktrees share it.
 
 ## Usage
 
