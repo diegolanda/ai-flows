@@ -8,7 +8,7 @@ description: |
   playbook lives in WORKFLOW.md next to this file.
 license: MIT
 metadata:
-  version: "0.0.8"
+  version: "0.0.9"
   workflow: "@diego/development"
 ---
 
