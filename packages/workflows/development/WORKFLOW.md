@@ -21,12 +21,14 @@ You are the workflow engine. `oak sync` installed this file, the skills, and the
 
 Set `targetRepository` to the absolute root of the repository that owns the task. Keep the current working directory unchanged during resolution.
 
-Try these sources in order:
+Try these sources in order. Stop after the first successful source. Do not run later sources after resolution succeeds.
 
-1. **OakShelf store**: run `oak inspect '@diego/branch-state' --project <targetRepository>` and `oak inspect '@diego/dev-hooks' --project <targetRepository>`. Use each returned package path as `<path>/bin.mjs` when the executable and its dependencies are available.
-2. **Target package installation**: run `pnpm --dir <targetRepository> exec diego-development-tools resolve --root <targetRepository>`. Existing installations without the resolver remain supported through `pnpm --dir <targetRepository> exec diego-branch-state` and `pnpm --dir <targetRepository> exec diego-dev-hook`.
-3. **Configured ai-flows checkout**: when `DIEGO_AI_FLOWS_ROOT` is set, run `node "$DIEGO_AI_FLOWS_ROOT/packages/tools/dev-hooks/resolve.mjs" resolve`. The resolver returns absolute `branchState` and `devHook` executable paths. The checkout can be anywhere on the filesystem.
-4. **Current ai-flows monorepo**: only when the current repository is ai-flows, run `node packages/tools/dev-hooks/resolve.mjs resolve --root "$(git rev-parse --show-toplevel)"`.
+1. **Configured ai-flows checkout**: when `DIEGO_AI_FLOWS_ROOT` is set, run `node "$DIEGO_AI_FLOWS_ROOT/packages/tools/dev-hooks/resolve.mjs" resolve`. Do not pass `--root` or the target repository. The resolver locates its sibling tools from its own package.
+2. **Current ai-flows monorepo**: only when the current repository is ai-flows, run `node packages/tools/dev-hooks/resolve.mjs resolve`. Do not pass a repository path.
+3. **OakShelf store**: run `oak inspect '@diego/branch-state' --project <targetRepository>` and `oak inspect '@diego/dev-hooks' --project <targetRepository>`. Use each returned package path as `<path>/bin.mjs` when the executable and its dependencies are available.
+4. **Target package installation**: run `pnpm --dir <targetRepository> exec diego-development-tools resolve`. Existing installations without the resolver remain supported through `pnpm --dir <targetRepository> exec diego-branch-state` and `pnpm --dir <targetRepository> exec diego-dev-hook`.
+
+The resolver accepts the old `--root` flag for compatibility with installed workflows. New commands must not use it. The target repository belongs only in the `--cwd` option of the resolved tools.
 
 Use the resolved executables from any one successful source:
 

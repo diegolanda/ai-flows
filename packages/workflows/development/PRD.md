@@ -723,7 +723,7 @@ pnpm exec diego-dev-hook pre-push
 
 `diego-dev-hook` is a deterministic hook runner provided by the tool packages. It contains no AI logic. Each command accepts `--cwd <target-repository>` so the executable can run from another repository.
 
-For cross-repository use, `DIEGO_AI_FLOWS_ROOT` identifies a local ai-flows checkout. The `diego-development-tools resolve` command returns absolute paths for `diego-branch-state` and `diego-dev-hook`. Resolution does not change the caller's working directory. A failure lists every attempted path and tells the developer how to configure the checkout.
+For cross-repository use, `DIEGO_AI_FLOWS_ROOT` identifies a local ai-flows checkout and locates its resolver. The `diego-development-tools resolve` command finds its own package dependencies and returns absolute paths for `diego-branch-state` and `diego-dev-hook`. The command does not accept the target repository as a tool root. Resolution does not change the caller's working directory. A failure lists every attempted path and tells the developer how to configure the checkout.
 
 No target repository should copy the implementation of intent generation, review, GitHub integration, or pipeline rendering.
 

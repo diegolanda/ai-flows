@@ -15,7 +15,7 @@ node <installed-path>/resolve.mjs resolve      # return branch-state and dev-hoo
 ```
 
 In a pnpm workspace the bin is also available as `pnpm exec diego-dev-hook`.
-The resolver is available as `pnpm exec diego-development-tools resolve`.
+The resolver is available as `pnpm exec diego-development-tools resolve`. It locates the tool entrypoints from its own package and dependencies. Do not pass the target repository to the resolver.
 
 ## Notes for agents
 

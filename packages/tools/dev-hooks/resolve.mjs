@@ -23,12 +23,14 @@ function print(value, stream = process.stdout) {
 function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (command !== "resolve") {
-    process.stderr.write("Usage: diego-development-tools resolve [--root <ai-flows-checkout>]\n");
+    process.stderr.write("Usage: diego-development-tools resolve\n");
     return 1;
   }
 
   try {
     const flags = parseFlags(rest);
+    // Keep the old flag working while installed workflows migrate to the
+    // self-locating resolver. A complete resolver package does not need it.
     print(resolveDevelopmentTools({ root: flags.root }));
     return 0;
   } catch (error) {

@@ -79,6 +79,21 @@ test("workflow consumes the skill", async () => {
   assert.match(workflow, /@diego\/simple-technical-writing/);
 });
 
+test("workflow uses the configured self-locating resolver first", async () => {
+  const packageJson = JSON.parse(await read("packages/workflows/development/package.json"));
+  const manifest = JSON.parse(await read("packages/workflows/development/oakshelf.json"));
+  const skill = await read("packages/workflows/development/SKILL.md");
+  const workflow = await read("packages/workflows/development/WORKFLOW.md");
+
+  assert.equal(packageJson.version, "0.0.9");
+  assert.equal(manifest.version, packageJson.version);
+  assert.equal(manifest.dependencies["@diego/dev-hooks"], "^0.0.4");
+  assert.match(skill, /^  version: "0\.0\.9"$/m);
+  assert.ok(workflow.indexOf("**Configured ai-flows checkout**") < workflow.indexOf("**OakShelf store**"));
+  assert.doesNotMatch(workflow, /diego-development-tools resolve --root/);
+  assert.doesNotMatch(workflow, /resolve\.mjs resolve --root/);
+});
+
 test("development profile defines agent-specific instructions", async () => {
   const packageJson = JSON.parse(
     await read("packages/profiles/development/package.json"),
