@@ -80,15 +80,25 @@ test("workflow consumes the skill", async () => {
 });
 
 test("workflow uses the configured self-locating resolver first", async () => {
+  const branchStatePackage = JSON.parse(await read("packages/tools/branch-state/package.json"));
+  const branchStateManifest = JSON.parse(await read("packages/tools/branch-state/oakshelf.json"));
+  const devHooksPackage = JSON.parse(await read("packages/tools/dev-hooks/package.json"));
+  const devHooksManifest = JSON.parse(await read("packages/tools/dev-hooks/oakshelf.json"));
   const packageJson = JSON.parse(await read("packages/workflows/development/package.json"));
   const manifest = JSON.parse(await read("packages/workflows/development/oakshelf.json"));
   const skill = await read("packages/workflows/development/SKILL.md");
   const workflow = await read("packages/workflows/development/WORKFLOW.md");
 
-  assert.equal(packageJson.version, "0.0.9");
+  assert.equal(branchStatePackage.version, "0.0.3");
+  assert.equal(branchStateManifest.version, branchStatePackage.version);
+  assert.equal(devHooksPackage.version, "0.0.5");
+  assert.equal(devHooksManifest.version, devHooksPackage.version);
+  assert.equal(devHooksManifest.dependencies["@diego/branch-state"], "^0.0.3");
+  assert.equal(packageJson.version, "0.0.10");
   assert.equal(manifest.version, packageJson.version);
-  assert.equal(manifest.dependencies["@diego/dev-hooks"], "^0.0.4");
-  assert.match(skill, /^  version: "0\.0\.9"$/m);
+  assert.equal(manifest.dependencies["@diego/branch-state"], "^0.0.3");
+  assert.equal(manifest.dependencies["@diego/dev-hooks"], "^0.0.5");
+  assert.match(skill, /^  version: "0\.0\.10"$/m);
   assert.ok(workflow.indexOf("**Configured ai-flows checkout**") < workflow.indexOf("**OakShelf store**"));
   assert.doesNotMatch(workflow, /diego-development-tools resolve --root/);
   assert.doesNotMatch(workflow, /resolve\.mjs resolve --root/);
